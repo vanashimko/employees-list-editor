@@ -1,6 +1,6 @@
-package employees;
+package EmployeesListEditor.employees;
 
-import employees.drivers.Car;
+import EmployeesListEditor.employees.drivers.Car;
 
 public abstract class Driver extends Employee {
     public enum DriverLicenseType {

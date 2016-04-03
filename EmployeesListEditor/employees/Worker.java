@@ -1,4 +1,4 @@
-package employees;
+package EmployeesListEditor.employees;
 
 public abstract class Worker extends Employee {
     private int rank;

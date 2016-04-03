@@ -1,4 +1,4 @@
-package employees;
+package EmployeesListEditor.employees;
 
 import java.io.Serializable;
 import java.util.Date;

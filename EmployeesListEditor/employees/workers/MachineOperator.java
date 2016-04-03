@@ -1,6 +1,6 @@
-package employees.workers;
+package EmployeesListEditor.employees.workers;
 
-import employees.Worker;
+import EmployeesListEditor.employees.Worker;
 
 public class MachineOperator extends Worker {
     public enum MachineType {

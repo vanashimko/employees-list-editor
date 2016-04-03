@@ -1,4 +1,4 @@
-package employees;
+package EmployeesListEditor.employees;
 
 public abstract class Engineer extends Employee{
     private String department;

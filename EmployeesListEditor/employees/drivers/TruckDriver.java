@@ -1,6 +1,6 @@
-package employees.drivers;
+package EmployeesListEditor.employees.drivers;
 
-import employees.Driver;
+import EmployeesListEditor.employees.Driver;
 
 public class TruckDriver extends Driver {
     public enum CargoType{

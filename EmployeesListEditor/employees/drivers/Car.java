@@ -1,4 +1,4 @@
-package employees.drivers;
+package EmployeesListEditor.employees.drivers;
 
 public class Car {
     private String model;

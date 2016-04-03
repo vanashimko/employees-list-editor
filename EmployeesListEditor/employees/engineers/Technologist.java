@@ -1,6 +1,6 @@
-package employees.engineers;
+package EmployeesListEditor.employees.engineers;
 
-import employees.Engineer;
+import EmployeesListEditor.employees.Engineer;
 
 public class Technologist extends Engineer {
     public enum TechnologyType {
