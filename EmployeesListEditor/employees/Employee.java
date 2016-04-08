@@ -1,7 +1,6 @@
 package EmployeesListEditor.employees;
 
 import java.io.Serializable;
-import java.util.Date;
 
 public abstract class Employee implements Serializable{
     private String surname;
@@ -9,7 +8,7 @@ public abstract class Employee implements Serializable{
     private String middleName;
     private int stage;
     private int hiringYear;
-    private Date dateOfBirth;
+    private int yearOfBirth;
 
     public String getSurname() {
         return surname;
@@ -51,11 +50,11 @@ public abstract class Employee implements Serializable{
         this.middleName = middleName;
     }
 
-    public Date getDateOfBirth() {
-        return dateOfBirth;
+    public int getYearOfBirth() {
+        return yearOfBirth;
     }
 
-    public void setDateOfBirth(Date dateOfBirth) {
-        this.dateOfBirth = dateOfBirth;
+    public void setYearOfBirth(int yearOfBirth) {
+        this.yearOfBirth = yearOfBirth;
     }
 }
