@@ -1,13 +1,10 @@
 package EmployeesListEditor;
 
-import java.lang.reflect.Method;
-
 public class FieldDescription {
     public enum FieldType {
         PRIMITIVE,
         LIST,
         OBJECT,
-        ENUM
     }
 
     private String name;
@@ -35,7 +32,7 @@ public class FieldDescription {
     }
 
     public String getClassName() {
-        return classType.getCanonicalName();
+        return classType.getName();
     }
 
     public Object getFieldValue() {

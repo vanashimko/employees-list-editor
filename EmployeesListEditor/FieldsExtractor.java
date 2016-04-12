@@ -2,11 +2,22 @@ package EmployeesListEditor;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashMap;
+import java.util.*;
 
 public class FieldsExtractor {
+    static Set<Class<?>> BOXED_PRIMITIVE = new HashSet<>();
+    static {
+        BOXED_PRIMITIVE.add(Boolean.class);
+        BOXED_PRIMITIVE.add(Byte.class);
+        BOXED_PRIMITIVE.add(Character.class);
+        BOXED_PRIMITIVE.add(Float.class);
+        BOXED_PRIMITIVE.add(Integer.class);
+        BOXED_PRIMITIVE.add(Long.class);
+        BOXED_PRIMITIVE.add(Short.class);
+        BOXED_PRIMITIVE.add(Double.class);
+    }
+
+
     public static ArrayList<FieldDescription> getFields(Object o) {
         ArrayList<FieldDescription> result = new ArrayList<>();
         HashMap<String, FieldDescription> fields = new HashMap<>();
@@ -20,7 +31,9 @@ public class FieldsExtractor {
                     try {
                         Object fieldValue = method.invoke(o);
                         fieldDescription.setFieldValue(fieldValue);
-                        fieldDescription.setClassType(fieldValue.getClass());
+                        if (fieldValue != null) {
+                            fieldDescription.setClassType(fieldValue.getClass());
+                        }
                     } catch (IllegalAccessException | InvocationTargetException e) {
                         e.printStackTrace();
                     }
@@ -54,11 +67,9 @@ public class FieldsExtractor {
     }
 
     public static FieldDescription.FieldType getFieldType(Class<?> c){
-        if (c.equals(Integer.class) || c.equals(String.class)){
+        if (BOXED_PRIMITIVE.contains(c) || c.isPrimitive() || c.equals(String.class) || c.isEnum()){
             return FieldDescription.FieldType.PRIMITIVE;
-        } else if (c.isEnum()) {
-            return FieldDescription.FieldType.ENUM;
-        } else if (Collection.class.isAssignableFrom(c)) {
+        } else if (List.class.isAssignableFrom(c)) {
             return FieldDescription.FieldType.LIST;
         } else return FieldDescription.FieldType.OBJECT;
     }

@@ -7,5 +7,5 @@ import java.lang.reflect.InvocationTargetException;
 
 public interface Serializer {
     void serialize(Object o, OutputStream outputStream) throws IOException;
-    Object deserialize(InputStream inputStream) throws IOException, ClassNotFoundException, InstantiationException, IllegalAccessException, InvocationTargetException;
+    Object deserialize(InputStream inputStream) throws IOException, ClassNotFoundException, InstantiationException, IllegalAccessException, InvocationTargetException, NoSuchMethodException;
 }

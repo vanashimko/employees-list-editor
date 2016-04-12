@@ -1,16 +1,17 @@
 package EmployeesListEditor;
 
+import EmployeesListEditor.employees.workers.MachineOperator;
+
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.lang.reflect.InvocationTargetException;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Scanner;
+import java.lang.reflect.Method;
+import java.util.*;
 
 public class CustomTextSerializer implements Serializer {
+    private int nestingLevel = 0;
     @Override
     public void serialize(Object o, OutputStream outputStream) throws IOException {
         OutputStreamWriter outputStreamWriter = new OutputStreamWriter(outputStream);
@@ -20,137 +21,162 @@ public class CustomTextSerializer implements Serializer {
     }
 
     @Override
-    public Object deserialize(InputStream inputStream) throws IOException, ClassNotFoundException, InstantiationException, IllegalAccessException, InvocationTargetException {
+    public Object deserialize(InputStream inputStream) throws IOException, ClassNotFoundException, InstantiationException, IllegalAccessException, InvocationTargetException, NoSuchMethodException {
         Scanner scanner = new Scanner(inputStream).useDelimiter("\\A");
-        return readObject(scanner.next());
+        String inputString = clearWhitespaces(scanner.next());
+        return readObject(inputString);
     }
 
-    private void writeObject(Object o, OutputStreamWriter outputStreamWriter) throws IOException{
-        if (o == null){
-            outputStreamWriter.append("null,");
-            return;
+    private void writeObject(Object o, OutputStreamWriter outputStreamWriter) throws IOException {
+
+        appendFormat(outputStreamWriter, "{");
+        nestingLevel++;
+
+        if (o == null) {
+            appendFormat(outputStreamWriter, "null");
+        } else {
+            String className = o.getClass().getName();
+            FieldDescription.FieldType fieldType = FieldsExtractor.getFieldType(o.getClass());
+            String header = fieldType.toString() + ":" + className + ":";
+            switch (fieldType) {
+                case PRIMITIVE:
+                    appendFormat(outputStreamWriter, header + "\"" + o.toString() + "\"");
+                    break;
+                case LIST:
+                    appendFormat(outputStreamWriter, header);
+                    nestingLevel++;
+                    appendFormat(outputStreamWriter, "[");
+                    nestingLevel++;
+                    for (Object listItem : (List) o) {
+                        writeObject(listItem, outputStreamWriter);
+                    }
+                    nestingLevel--;
+                    appendFormat(outputStreamWriter, "]");
+                    nestingLevel--;
+                    break;
+                case OBJECT:
+                    appendFormat(outputStreamWriter, header);
+                    nestingLevel++;
+                    appendFormat(outputStreamWriter, "[");
+                    nestingLevel++;
+                    ArrayList<FieldDescription> fields = FieldsExtractor.getFields(o);
+                    for (FieldDescription field : fields) {
+                        appendFormat(outputStreamWriter, field.getName() + ":");
+                        writeObject(field.getFieldValue(), outputStreamWriter);
+                    }
+                    nestingLevel--;
+                    appendFormat(outputStreamWriter, "]");
+                    nestingLevel--;
+                    break;
+            }
         }
-        outputStreamWriter.append("{");
-        String className = o.getClass().getCanonicalName();
-        switch (FieldsExtractor.getFieldType(o.getClass())){
-            case PRIMITIVE:
-                outputStreamWriter.append("Primitive:");
-                outputStreamWriter.append(className).append(":");
-                outputStreamWriter.append("\"").append(o.toString()).append("\"");
-                break;
-            case LIST:
-                outputStreamWriter.append("List:");
-                outputStreamWriter.append(className).append(":");
-                outputStreamWriter.append("[");
-                for (Object listItem : (List) o) {
-                    writeObject(listItem, outputStreamWriter);
-                }
-                outputStreamWriter.append("]");
-                break;
-            case ENUM:
-                outputStreamWriter.append("Enum:");
-                outputStreamWriter.append(className).append(":");
-                outputStreamWriter.append("\"").append(o.toString()).append("\"");
-                break;
-            case OBJECT:
-                outputStreamWriter.write("Object:");
-                outputStreamWriter.append(className).append(":");
-                outputStreamWriter.append("[");
-                ArrayList<FieldDescription> fields = FieldsExtractor.getFields(o);
-                for (FieldDescription field : fields){
-                    outputStreamWriter.append(field.getName()).append(":");
-                    writeObject(field.getFieldValue(), outputStreamWriter);
-                }
-                outputStreamWriter.append("]");
-                break;
-        }
-        outputStreamWriter.append("}");
+        nestingLevel--;
+        appendFormat(outputStreamWriter, "}");
     }
 
-    private static Object readObject(String inputString) throws InstantiationException, IllegalAccessException, ClassNotFoundException{
+    private static Object createPrimitiveObject(String className, String value) throws NoSuchMethodException, ClassNotFoundException, IllegalAccessException, InvocationTargetException {
+        Class<?> primitiveClass = Class.forName(className);
+        Method valueOf = primitiveClass.getMethod("valueOf", String.class);
+        return valueOf.invoke(null, value);
+    }
+
+    private Object readObject(String inputString) throws InstantiationException, IllegalAccessException, ClassNotFoundException, NoSuchMethodException, InvocationTargetException {
 //        int startIndex = inputString.indexOf('{') + 1;
 //        int endIndex = inputString.indexOf(':', startIndex);
-//        String itemType = inputString.substring(startIndex, endIndex);
+//        String inputStringName = inputString.substring(startIndex, endIndex);
+//        FieldDescription.FieldType fieldType = FieldDescription.FieldType.valueOf(inputStringName);
 //
 //        startIndex = endIndex + 1;
 //        endIndex = inputString.indexOf(':', startIndex);
 //        String className = inputString.substring(startIndex, endIndex);
-//        switch (itemType){
-//            case "Primitive":
-//                startIndex = endIndex + 1;
-//                endIndex = getBlockEnd(inputString, startIndex, '"', '"');
-//                String value = inputString.substring(startIndex, endIndex);
-//                switch (className){
-//                    case "java.lang.Integer":
-//                        return Integer.valueOf(value);
-//                    case "java.lang.String":
-//                        return value;
-//                }
-//                break;
-//            case "List":
+//        startIndex = endIndex + 1;
+//        switch (fieldType) {
+//            case PRIMITIVE:
+//                endIndex = inputString.indexOf('"', startIndex + 1);
+//                String value = inputString.substring(startIndex + 1, endIndex);
+//                return createPrimitiveObject(className, value);
+//            case LIST:
 //                ArrayList<Object> list = new ArrayList<>();
-//                startIndex = endIndex + 1;
 //                endIndex = getBlockEnd(inputString, startIndex, '[', ']');
-//                String listBlock = inputString.substring(startIndex, endIndex);
+//                String listBlock = inputString.substring(startIndex + 1, endIndex);
 //                startIndex = 0;
-//                while ((startIndex = listBlock.indexOf("{", startIndex)) != -1){
+//                while ((startIndex = listBlock.indexOf("{", startIndex)) != -1) {
 //                    endIndex = getBlockEnd(listBlock, startIndex, '{', '}');
 //                    list.add(readObject(listBlock.substring(startIndex, endIndex)));
 //                    startIndex = endIndex + 1;
 //                }
 //                return list;
-//            case "Object":
-//                Object o = createObjectByClassName(className);
+//            case OBJECT:
 //                startIndex = endIndex + 1;
 //                endIndex = getBlockEnd(inputString, startIndex, '[', ']');
 //                String objectBlock = inputString.substring(startIndex + 1, endIndex);
-//                startIndex = 0;
 //                endIndex = 0;
 //                HashMap<String, Object> fields = new HashMap<>();
-//                while (startIndex = objectBlock.indexOf(':'))
-//
-//
-//
+//                while ((startIndex = objectBlock.indexOf(':')) != -1) {
+//                    String fieldName = objectBlock.substring(endIndex, startIndex);
+//                    startIndex++;
+//                    endIndex = getBlockEnd(objectBlock, startIndex, '{', '}');
+//                    Object fieldValue = readObject(objectBlock.substring(startIndex, endIndex));
+//                    fields.put(fieldName, fieldValue);
+//                    endIndex++;
+//                }
+//                return constructObject(className, fields);
 //        }
         return null;
+
     }
 
-    private static String getType(String inputString){
-        return inputString.substring(inputString.indexOf('{') + 1, inputString.indexOf(':'));
-    }
-
-    private static String getClassName(String inputString){
-        return inputString.substring(inputString.indexOf(':') + 1, inputString.indexOf(':'));
-    }
-
-    private static Object createObjectByClassName(String className) throws ClassNotFoundException, IllegalAccessException, InstantiationException{
+    private static Object createObjectByClassName(String className) throws ClassNotFoundException, IllegalAccessException, InstantiationException {
         Class classDefinition = Class.forName(className);
         return classDefinition.newInstance();
     }
 
-    private static int getBlockEnd(String inputString, int startIndex, char startChar, char endChar){
+    private static Object constructObject(String className, Map<String, Object> fields) throws ClassNotFoundException, IllegalAccessException, InstantiationException, NoSuchMethodException, InvocationTargetException {
+        Object o = createObjectByClassName(className);
+        for (Map.Entry<String, Object> entry : fields.entrySet()){
+            String fieldName = entry.getKey();
+            Object fieldValue = entry.getValue();
+            Method setterMethod = o.getClass().getMethod("set" + fieldName, o.getClass(), fieldValue.getClass());
+            setterMethod.invoke(o, entry.getValue());
+        }
+        return o;
+    }
+
+    private static int getBlockEnd(String inputString, int startIndex, char startChar, char endChar) {
         int nestingLevel = 1;
-        int i = inputString.indexOf(startChar, startIndex) + 1;
-        while (!(nestingLevel == 0 && inputString.charAt(i) == endChar)){
-            if (inputString.charAt(i) == startChar){
+        int i = startIndex + 1;
+        while (nestingLevel != 0) {
+            if (inputString.charAt(i) == startChar) {
                 nestingLevel++;
-            } else if (inputString.charAt(i) == endChar){
+            } else if (inputString.charAt(i) == endChar) {
                 nestingLevel--;
             }
             i++;
         }
-        return i;
+        return i - 1;
     }
 
-    private static String getCollectionBlock(String inputString, int startIndex){
-        return inputString.substring(startIndex + 1, getBlockEnd(inputString, startIndex, '[', ']'));
+    private static String clearWhitespaces(String inputString){
+        StringBuilder result = new StringBuilder(inputString);
+        boolean isStr = false;
+        for (int i = 0; i < result.length(); i++){
+            char currentChar = result.charAt(i);
+            if (currentChar == '"'){
+                isStr = !isStr;
+            } else if (Character.isWhitespace(currentChar) && !isStr){
+                result.deleteCharAt(i);
+                i--;
+            }
+        }
+
+        return result.toString();
     }
 
-    private static String getItemBlock(String inputString, int startIndex){
-        return inputString.substring(startIndex + 1, getBlockEnd(inputString, startIndex, '{', '}'));
-    }
-
-    private static String getPrimitiveValueBlock(String inputString, int startIndex){
-        return inputString.substring(startIndex + 1, getBlockEnd(inputString, startIndex, '"', '"'));
+    private void appendFormat(OutputStreamWriter out, String s) throws IOException{
+        for (int i = 0; i < nestingLevel; i++){
+            out.append('\t');
+        }
+        out.append(s);
+        out.append('\n');
     }
 }
