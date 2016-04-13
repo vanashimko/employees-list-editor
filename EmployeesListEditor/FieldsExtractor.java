@@ -5,16 +5,24 @@ import java.lang.reflect.Method;
 import java.util.*;
 
 public class FieldsExtractor {
-    static Set<Class<?>> BOXED_PRIMITIVE = new HashSet<>();
+    static Map<Class<?>, Class<?>> BOXED_PRIMITIVE = new HashMap<>();
     static {
-        BOXED_PRIMITIVE.add(Boolean.class);
-        BOXED_PRIMITIVE.add(Byte.class);
-        BOXED_PRIMITIVE.add(Character.class);
-        BOXED_PRIMITIVE.add(Float.class);
-        BOXED_PRIMITIVE.add(Integer.class);
-        BOXED_PRIMITIVE.add(Long.class);
-        BOXED_PRIMITIVE.add(Short.class);
-        BOXED_PRIMITIVE.add(Double.class);
+        BOXED_PRIMITIVE.put(Boolean.class, boolean.class);
+        BOXED_PRIMITIVE.put(Byte.class, byte.class);
+        BOXED_PRIMITIVE.put(Character.class, char.class);
+        BOXED_PRIMITIVE.put(Float.class, float.class);
+        BOXED_PRIMITIVE.put(Integer.class, int.class);
+        BOXED_PRIMITIVE.put(Long.class, long.class);
+        BOXED_PRIMITIVE.put(Short.class, short.class);
+        BOXED_PRIMITIVE.put(Double.class, double.class);
+    }
+
+    public static boolean isBoxed(Class<?> c){
+        return BOXED_PRIMITIVE.containsKey(c);
+    }
+
+    public static Class<?> getBoxedType(Class<?> boxedType){
+        return BOXED_PRIMITIVE.get(boxedType);
     }
 
 
@@ -67,7 +75,7 @@ public class FieldsExtractor {
     }
 
     public static FieldDescription.FieldType getFieldType(Class<?> c){
-        if (BOXED_PRIMITIVE.contains(c) || c.isPrimitive() || c.equals(String.class) || c.isEnum()){
+        if (isBoxed(c) || c.isPrimitive() || c.equals(String.class) || c.isEnum()){
             return FieldDescription.FieldType.PRIMITIVE;
         } else if (List.class.isAssignableFrom(c)) {
             return FieldDescription.FieldType.LIST;
