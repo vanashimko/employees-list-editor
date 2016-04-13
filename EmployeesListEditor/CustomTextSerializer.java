@@ -1,8 +1,5 @@
 package EmployeesListEditor;
 
-import EmployeesListEditor.employees.workers.MachineOperator;
-import com.sun.corba.se.spi.activation.NoSuchEndPointHelper;
-
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -86,6 +83,9 @@ public class CustomTextSerializer implements Serializer {
     }
 
     private Object readObject(String inputString) throws InstantiationException, IllegalAccessException, ClassNotFoundException, NoSuchMethodException, InvocationTargetException {
+        if (inputString.equals("null")){
+            return null;
+        }
         int startIndex = inputString.indexOf('{') + 1;
         int endIndex = inputString.indexOf(':', startIndex);
         String inputStringName = inputString.substring(startIndex, endIndex);
@@ -121,23 +121,21 @@ public class CustomTextSerializer implements Serializer {
                     String fieldName = objectBlock.substring(endIndex, startIndex);
                     startIndex++;
                     endIndex = getBlockEnd(objectBlock, startIndex, '{', '}');
-                    Object fieldValue = readObject(objectBlock.substring(startIndex, endIndex));
-                    fields.put(fieldName, fieldValue);
+                    Object fieldValue = readObject(objectBlock.substring(startIndex + 1, endIndex));
+                    if (fieldValue != null) {
+                        fields.put(fieldName, fieldValue);
+                    }
                     endIndex++;
                 }
                 return constructObject(className, fields);
+            default:
+                return null;
         }
-        return null;
-
-    }
-
-    private static Object createObjectByClassName(String className) throws ClassNotFoundException, IllegalAccessException, InstantiationException {
-        Class classDefinition = Class.forName(className);
-        return classDefinition.newInstance();
     }
 
     private static Object constructObject(String className, Map<String, Object> fields) throws ClassNotFoundException, IllegalAccessException, InstantiationException, NoSuchMethodException, InvocationTargetException {
-        Object o = createObjectByClassName(className);
+        Class<?> classDefinition = Class.forName(className);
+        Object o = classDefinition.newInstance();
         for (Map.Entry<String, Object> entry : fields.entrySet()){
             String fieldName = entry.getKey();
             Object fieldValue = entry.getValue();
@@ -145,10 +143,10 @@ public class CustomTextSerializer implements Serializer {
             Class<?> fieldType = fieldValue.getClass();
             Method setterMethod;
             try {
-                setterMethod = o.getClass().getMethod(setterName, fieldType);
+                setterMethod = classDefinition.getMethod(setterName, fieldType);
             } catch (NoSuchMethodException e){
                 if (FieldsExtractor.isBoxed(fieldType)) {
-                    setterMethod = o.getClass().getMethod(setterName, FieldsExtractor.getBoxedType(fieldType));
+                    setterMethod = classDefinition.getMethod(setterName, FieldsExtractor.getBoxedType(fieldType));
                 } else {
                     throw e;
                 }

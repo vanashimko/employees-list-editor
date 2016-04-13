@@ -59,7 +59,7 @@ public class FieldsExtractor {
     }
 
     private static boolean isGetter(String methodName) {
-        return methodName.startsWith("get") && !methodName.equals("getClass");
+        return (methodName.startsWith("get") && !methodName.equals("getClass")) || (methodName.startsWith("is"));
     }
 
     private static boolean isSetter(String methodName) {
@@ -71,7 +71,11 @@ public class FieldsExtractor {
     }
 
     private static String getFieldName(String accessorName) {
-        return accessorName.substring("get".length());
+        if (accessorName.startsWith("is")) {
+            return accessorName.substring("is".length());
+        } else {
+            return accessorName.substring("get".length());
+        }
     }
 
     public static FieldDescription.FieldType getFieldType(Class<?> c){

@@ -25,6 +25,7 @@ public class Main {
         Programmer p = new Programmer();
         p.setName("Ivan");
         p.setSurname("Shimko");
+        p.setStupid(true);
         p.setHiringYear(2007);
         p.setYearOfBirth(1997);
         p.setMiddleName("Владимирович");
