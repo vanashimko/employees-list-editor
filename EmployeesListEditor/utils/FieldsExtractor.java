@@ -1,11 +1,11 @@
-package EmployeesListEditor;
+package EmployeesListEditor.utils;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.*;
 
 public class FieldsExtractor {
-    static Map<Class<?>, Class<?>> BOXED_PRIMITIVE = new HashMap<>();
+    private static Map<Class<?>, Class<?>> BOXED_PRIMITIVE = new HashMap<>();
     static {
         BOXED_PRIMITIVE.put(Boolean.class, boolean.class);
         BOXED_PRIMITIVE.put(Byte.class, byte.class);

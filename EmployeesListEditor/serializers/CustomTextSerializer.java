@@ -1,4 +1,7 @@
-package EmployeesListEditor;
+package EmployeesListEditor.serializers;
+
+import EmployeesListEditor.utils.FieldDescription;
+import EmployeesListEditor.utils.FieldsExtractor;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -13,6 +16,7 @@ public class CustomTextSerializer implements Serializer {
     @Override
     public void serialize(Object o, OutputStream outputStream) throws IOException {
         OutputStreamWriter outputStreamWriter = new OutputStreamWriter(outputStream);
+        nestingLevel = 0;
         writeObject(o, outputStreamWriter);
         outputStreamWriter.close();
 

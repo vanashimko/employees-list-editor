@@ -1,16 +1,10 @@
 package EmployeesListEditor;
 
-import EmployeesListEditor.employees.Employee;
 import EmployeesListEditor.employees.engineers.Programmer;
 import EmployeesListEditor.employees.workers.MachineOperator;
 
-import java.io.*;
-import java.util.ArrayList;
-import java.util.List;
-
 public class Main {
-    public static void main(String[] args){
-        CustomTextSerializer customTextSerializer = new CustomTextSerializer();
+    private static void test(){
         MachineOperator w = new MachineOperator();
         w.setName("Bob");
         w.setSurname("Kent");
@@ -31,23 +25,18 @@ public class Main {
         p.setCurrentProject("Vk app for desktop");
         p.setDepartment("MyDepartment");
         p.setProgrammingLanguage(Programmer.ProgrammingLanguage.C);
-        try {
-            BufferedOutputStream fileOutputStream = new BufferedOutputStream(new FileOutputStream("output.txt"));
-            List<Employee> l = new ArrayList<>();
-            l.add(w);
-            l.add(p);
-            customTextSerializer.serialize(l, fileOutputStream);
-            fileOutputStream.close();
-        } catch (IOException e){
-            e.printStackTrace();
-        }
 
+        EmployeesList employeesList = new EmployeesList();
+        employeesList.addEmployee(p);
+        employeesList.addEmployee(w);
         try {
-            BufferedInputStream fileInputStream = new BufferedInputStream(new FileInputStream("output.txt"));
-            Object o = customTextSerializer.deserialize(fileInputStream);
-            System.out.println(o);
+            employeesList.serialize("output.txt", EmployeesList.SerializerType.CUSTOM);
+            employeesList.deserialize("output.txt", EmployeesList.SerializerType.CUSTOM);
         } catch (Exception e){
             e.printStackTrace();
         }
+    }
+    public static void main(String[] args){
+        test();
     }
 }

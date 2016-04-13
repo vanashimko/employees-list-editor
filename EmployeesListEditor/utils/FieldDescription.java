@@ -1,4 +1,4 @@
-package EmployeesListEditor;
+package EmployeesListEditor.utils;
 
 public class FieldDescription {
     public enum FieldType {

@@ -1,4 +1,4 @@
-package EmployeesListEditor;
+package EmployeesListEditor.serializers;
 
 import java.beans.XMLDecoder;
 import java.beans.XMLEncoder;
