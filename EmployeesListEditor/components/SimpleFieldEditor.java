@@ -34,8 +34,7 @@ public class SimpleFieldEditor extends FieldEditor {
 
     @Override
     protected void writeToControl(Object object) {
-        textField.setText(object.toString());
-
+        textField.setText((object == null)?"":object.toString());
     }
 
     @Override

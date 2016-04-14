@@ -38,9 +38,7 @@ public class FieldsExtractor {
                     try {
                         Object fieldValue = method.invoke(o);
                         fieldDescription.setFieldValue(fieldValue);
-                        if (fieldValue != null) {
-                            fieldDescription.setFieldType(fieldValue.getClass());
-                        }
+                        fieldDescription.setFieldType(method.getReturnType());
                         fieldDescription.setGetter(method);
                     } catch (IllegalAccessException | InvocationTargetException e) {
                         e.printStackTrace();

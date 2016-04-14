@@ -9,12 +9,13 @@ import java.lang.reflect.Method;
 
 public class EnumFieldEditor extends FieldEditor {
     private JComboBox comboBox;
+    private Enum[] enumValues;
 
-    private static Enum[] getEnumValues(Class<?> enumType){
+    private static Enum[] getEnumValues(Class<?> enumType) {
         try {
             Method values = enumType.getMethod("values");
-            return (Enum[])values.invoke(null);
-        } catch (NoSuchMethodException | IllegalAccessException | InvocationTargetException e){
+            return (Enum[]) values.invoke(null);
+        } catch (NoSuchMethodException | IllegalAccessException | InvocationTargetException e) {
             e.printStackTrace();
         }
         return null;
@@ -23,11 +24,11 @@ public class EnumFieldEditor extends FieldEditor {
     public EnumFieldEditor(Object o, FieldDescription fieldDescription) {
         this.object = o;
         this.fieldDescription = fieldDescription;
-
-        comboBox = new JComboBox(getEnumValues(fieldDescription.getFieldType()));
+        enumValues = getEnumValues(fieldDescription.getFieldType());
+        comboBox = new JComboBox(enumValues);
         getValueFromObject();
         comboBox.addItemListener(e -> {
-            if (e.getStateChange() == ItemEvent.SELECTED){
+            if (e.getStateChange() == ItemEvent.SELECTED) {
                 saveValueToObject();
             }
         });
