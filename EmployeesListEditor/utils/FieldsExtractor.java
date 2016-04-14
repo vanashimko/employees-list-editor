@@ -25,7 +25,6 @@ public class FieldsExtractor {
         return BOXED_PRIMITIVE.get(boxedType);
     }
 
-
     public static ArrayList<FieldDescription> getFields(Object o) {
         ArrayList<FieldDescription> result = new ArrayList<>();
         HashMap<String, FieldDescription> fields = new HashMap<>();
@@ -40,11 +39,14 @@ public class FieldsExtractor {
                         Object fieldValue = method.invoke(o);
                         fieldDescription.setFieldValue(fieldValue);
                         if (fieldValue != null) {
-                            fieldDescription.setClassType(fieldValue.getClass());
+                            fieldDescription.setFieldType(fieldValue.getClass());
                         }
+                        fieldDescription.setGetter(method);
                     } catch (IllegalAccessException | InvocationTargetException e) {
                         e.printStackTrace();
                     }
+                } else {
+                    fieldDescription.setSetter(method);
                 }
                 if (newField){
                     fields.put(fieldName, fieldDescription);

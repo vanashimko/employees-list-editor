@@ -2,6 +2,7 @@ package EmployeesListEditor.serializers;
 
 import EmployeesListEditor.utils.FieldDescription;
 import EmployeesListEditor.utils.FieldsExtractor;
+import EmployeesListEditor.utils.ReflectHelper;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -76,16 +77,6 @@ public class CustomTextSerializer implements Serializer {
         appendFormat(outputStreamWriter, "}");
     }
 
-    private static Object createPrimitiveObject(String className, String value) throws NoSuchMethodException, ClassNotFoundException, IllegalAccessException, InvocationTargetException {
-        Class<?> primitiveClass = Class.forName(className);
-        if (primitiveClass != String.class) {
-            Method valueOf = primitiveClass.getMethod("valueOf", String.class);
-            return valueOf.invoke(null, value);
-        } else {
-            return value;
-        }
-    }
-
     private Object readObject(String inputString) throws InstantiationException, IllegalAccessException, ClassNotFoundException, NoSuchMethodException, InvocationTargetException {
         if (inputString.equals("null")){
             return null;
@@ -103,7 +94,7 @@ public class CustomTextSerializer implements Serializer {
             case PRIMITIVE:
                 endIndex = inputString.indexOf('"', startIndex + 1);
                 String value = inputString.substring(startIndex + 1, endIndex);
-                return createPrimitiveObject(className, value);
+                return ReflectHelper.createPrimitiveObject(className, value);
             case LIST:
                 ArrayList<Object> list = new ArrayList<>();
                 endIndex = getBlockEnd(inputString, startIndex, '[', ']');

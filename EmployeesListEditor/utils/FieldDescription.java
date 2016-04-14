@@ -1,5 +1,7 @@
 package EmployeesListEditor.utils;
 
+import java.lang.reflect.Method;
+
 public class FieldDescription {
     public enum FieldType {
         PRIMITIVE,
@@ -8,10 +10,27 @@ public class FieldDescription {
     }
 
     private String name;
-    private Class<?>  classType;
+    private Class<?> fieldType;
     private Object fieldValue;
+    private Method getter, setter;
 
-    public FieldDescription(String name){
+    public Method getGetter() {
+        return getter;
+    }
+
+    public void setGetter(Method getter) {
+        this.getter = getter;
+    }
+
+    public Method getSetter() {
+        return setter;
+    }
+
+    public void setSetter(Method setter) {
+        this.setter = setter;
+    }
+
+    public FieldDescription(String name) {
         this.name = name;
     }
 
@@ -23,16 +42,16 @@ public class FieldDescription {
         this.name = name;
     }
 
-    public Class<?> getClassType() {
-        return classType;
+    public Class<?> getFieldType() {
+        return fieldType;
     }
 
-    public void setClassType(Class<?> classType) {
-        this.classType = classType;
+    public void setFieldType(Class<?> fieldType) {
+        this.fieldType = fieldType;
     }
 
     public String getClassName() {
-        return classType.getName();
+        return fieldType.getName();
     }
 
     public Object getFieldValue() {
