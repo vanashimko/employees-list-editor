@@ -1,4 +1,4 @@
-package EmployeesListEditor.components;
+package EmployeesListEditor.gui;
 
 import EmployeesListEditor.utils.FieldDescription;
 import EmployeesListEditor.utils.ReflectHelper;
@@ -25,7 +25,7 @@ public abstract class FieldEditor {
 
     public void saveValueToObject() {
         try {
-            fieldDescription.setFieldValue(ReflectHelper.createPrimitiveObject(fieldDescription.getFieldType(), readFromControl()));
+            fieldDescription.setFieldValue(ReflectHelper.createPrimitiveObject(fieldDescription.getClassType(), readFromControl()));
             fieldDescription.getSetter().invoke(object, fieldDescription.getFieldValue());
         } catch (NoSuchMethodException | IllegalAccessException | InvocationTargetException | ClassNotFoundException e){
             e.printStackTrace();

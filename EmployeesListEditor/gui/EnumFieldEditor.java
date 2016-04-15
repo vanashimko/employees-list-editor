@@ -1,4 +1,4 @@
-package EmployeesListEditor.components;
+package EmployeesListEditor.gui;
 
 import EmployeesListEditor.utils.FieldDescription;
 
@@ -8,7 +8,7 @@ import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 
 public class EnumFieldEditor extends FieldEditor {
-    private JComboBox comboBox;
+    private JComboBox<Enum> comboBox;
     private Enum[] enumValues;
 
     private static Enum[] getEnumValues(Class<?> enumType) {
@@ -24,8 +24,8 @@ public class EnumFieldEditor extends FieldEditor {
     public EnumFieldEditor(Object o, FieldDescription fieldDescription) {
         this.object = o;
         this.fieldDescription = fieldDescription;
-        enumValues = getEnumValues(fieldDescription.getFieldType());
-        comboBox = new JComboBox(enumValues);
+        enumValues = (Enum[])fieldDescription.getClassType().getEnumConstants();
+        comboBox = new JComboBox<>(enumValues);
         getValueFromObject();
         comboBox.addItemListener(e -> {
             if (e.getStateChange() == ItemEvent.SELECTED) {

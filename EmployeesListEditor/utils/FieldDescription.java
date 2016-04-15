@@ -10,7 +10,7 @@ public class FieldDescription {
     }
 
     private String name;
-    private Class<?> fieldType;
+    private Class<?> classType;
     private Object fieldValue;
     private Method getter, setter;
 
@@ -38,20 +38,20 @@ public class FieldDescription {
         return name;
     }
 
-    public void setName(String name) {
-        this.name = name;
+    public Class<?> getClassType() {
+        return classType;
     }
 
-    public Class<?> getFieldType() {
-        return fieldType;
-    }
-
-    public void setFieldType(Class<?> fieldType) {
-        this.fieldType = fieldType;
+    public void setClassType(Class<?> classType) {
+        this.classType = classType;
     }
 
     public String getClassName() {
-        return fieldType.getName();
+        return classType.getName();
+    }
+
+    public FieldType getFieldType(){
+        return FieldsExtractor.getFieldType(getClassType());
     }
 
     public Object getFieldValue() {

@@ -2,7 +2,7 @@ package EmployeesListEditor.employees;
 
 import java.io.Serializable;
 
-public abstract class Employee implements Serializable{
+public abstract class Employee implements Serializable {
     private String surname;
     private String name;
     private String middleName;
@@ -56,5 +56,24 @@ public abstract class Employee implements Serializable{
 
     public void setYearOfBirth(int yearOfBirth) {
         this.yearOfBirth = yearOfBirth;
+    }
+
+    public String getProfession() {
+        return getClass().getSimpleName();
+    }
+
+    public String getDescription() {
+        String name = getName();
+        name = (name == null)?"":name;
+
+        String surname = getSurname();
+        surname = (surname == null)?"":surname;
+
+        String profession = getProfession();
+        String result = String.join(" ", name, surname);
+        if (result.equals(" ")){
+            return profession;
+        }
+        return result;
     }
 }

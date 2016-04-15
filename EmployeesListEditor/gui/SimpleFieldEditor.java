@@ -1,4 +1,4 @@
-package EmployeesListEditor.components;
+package EmployeesListEditor.gui;
 
 import EmployeesListEditor.utils.FieldDescription;
 

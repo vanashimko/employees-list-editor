@@ -1,19 +1,25 @@
 package EmployeesListEditor;
 
-import EmployeesListEditor.components.EnumFieldEditor;
-import EmployeesListEditor.components.SimpleFieldEditor;
+import EmployeesListEditor.gui.EnumFieldEditor;
+import EmployeesListEditor.gui.MainWindow;
+import EmployeesListEditor.gui.SimpleFieldEditor;
 import EmployeesListEditor.employees.engineers.Programmer;
 import EmployeesListEditor.employees.workers.MachineOperator;
 import EmployeesListEditor.utils.FieldDescription;
 import EmployeesListEditor.utils.FieldsExtractor;
-import EmployeesListEditor.utils.ReflectHelper;
 
 import javax.swing.*;
 import java.awt.*;
-import java.sql.Ref;
 import java.util.ArrayList;
 
 public class Main {
+    private static void setSystemLookAndFeel() {
+        try {
+            UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
+        } catch (Exception e) {
+            System.err.println("Error while changing Look and Feel");
+        }
+    }
     private static void serializationTest() {
         MachineOperator w = new MachineOperator();
         w.setName("Bob");
@@ -64,7 +70,7 @@ public class Main {
         mainFrame.setLayout(new FlowLayout());
         ArrayList<FieldDescription> fields = FieldsExtractor.getFields(w);
         for (FieldDescription field : fields) {
-            if (field.getFieldType().isEnum()) {
+            if (field.getClassType().isEnum()) {
                 mainFrame.add(new EnumFieldEditor(w, field).getControl());
             } else {
                 mainFrame.add((new SimpleFieldEditor(w, field)).getControl());
@@ -75,6 +81,9 @@ public class Main {
     }
 
     public static void main(String[] args) {
-        serializationTest();
+        setSystemLookAndFeel();
+        new MainWindow();
+        //dataMappingTest();
+//        serializationTest();
     }
 }
