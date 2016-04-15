@@ -6,15 +6,15 @@ import EmployeesListEditor.utils.ReflectHelper;
 import javax.swing.*;
 import java.lang.reflect.InvocationTargetException;
 
-public abstract class FieldEditor {
-    protected FieldDescription fieldDescription;
+abstract class FieldEditor {
+    FieldDescription fieldDescription;
     protected Object object;
 
     protected abstract void writeToControl(Object object);
     protected abstract String readFromControl();
     public abstract JComponent getControl();
 
-    public void getValueFromObject() {
+    void getValueFromObject() {
         try{
             Object fieldValue = fieldDescription.getGetter().invoke(object);
             writeToControl(fieldValue);
@@ -23,9 +23,13 @@ public abstract class FieldEditor {
         }
     }
 
-    public void saveValueToObject() {
+    void saveValueToObject() {
         try {
-            fieldDescription.setFieldValue(ReflectHelper.createPrimitiveObject(fieldDescription.getClassType(), readFromControl()));
+            String controlData = readFromControl();
+            if (controlData.isEmpty()){
+                return;
+            }
+            fieldDescription.setFieldValue(ReflectHelper.createPrimitiveObject(fieldDescription.getClassType(), controlData));
             fieldDescription.getSetter().invoke(object, fieldDescription.getFieldValue());
         } catch (NoSuchMethodException | IllegalAccessException | InvocationTargetException | ClassNotFoundException e){
             e.printStackTrace();

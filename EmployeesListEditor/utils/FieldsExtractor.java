@@ -25,6 +25,15 @@ public class FieldsExtractor {
         return BOXED_PRIMITIVE.get(boxedType);
     }
 
+    private static Class<?> getWrapperType(Class<?> primitiveType) {
+        for (Map.Entry<Class<?>, Class<?>> entry : BOXED_PRIMITIVE.entrySet()){
+            if (primitiveType.equals(entry.getValue())){
+                return entry.getKey();
+            }
+        }
+        return null;
+    }
+
     public static ArrayList<FieldDescription> getFields(Object o) {
         ArrayList<FieldDescription> result = new ArrayList<>();
         HashMap<String, FieldDescription> fields = new HashMap<>();
@@ -38,7 +47,11 @@ public class FieldsExtractor {
                     try {
                         Object fieldValue = method.invoke(o);
                         fieldDescription.setFieldValue(fieldValue);
-                        fieldDescription.setClassType(method.getReturnType());
+                        Class<?> classType = method.getReturnType();
+                        if (classType.isPrimitive()){
+                            classType = getWrapperType(classType);
+                        }
+                        fieldDescription.setClassType(classType);
                         fieldDescription.setGetter(method);
                     } catch (IllegalAccessException | InvocationTargetException e) {
                         e.printStackTrace();

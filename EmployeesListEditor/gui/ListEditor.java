@@ -1,21 +1,25 @@
 package EmployeesListEditor.gui;
 
-import EmployeesListEditor.EmployeesList;
 import EmployeesListEditor.employees.Employee;
+import EmployeesListEditor.serializers.BinarySerializer;
+import EmployeesListEditor.serializers.CustomTextSerializer;
+import EmployeesListEditor.serializers.Serializer;
+import EmployeesListEditor.serializers.XMLSerializer;
 
 import javax.swing.*;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 import java.awt.*;
-import java.util.Map;
+import java.io.*;
+import java.lang.reflect.InvocationTargetException;
+import java.util.*;
+import java.util.List;
 
 public class ListEditor extends JPanel implements ListSelectionListener {
     private JList<Employee> list;
-    private DefaultListModel<Employee> listModel;
-    private EmployeesList employeesList = new EmployeesList();
-    private Map<String, Class<? extends Employee>> availableTypes;
+    private EmployeeListModel listModel;
+    private java.util.List<Employee> employeeList = new ArrayList<>();
 
-    private JButton addButton;
     private JButton removeButton;
     private JButton editButton;
 
@@ -23,10 +27,9 @@ public class ListEditor extends JPanel implements ListSelectionListener {
 
     private Frame owner;
 
-    public ListEditor(Frame owner, Map<String, Class<? extends Employee>> availableTypes) {
+    ListEditor(Frame owner, Map<String, Class<? extends Employee>> availableTypes) {
         super(new BorderLayout());
 
-        this.availableTypes = availableTypes;
         this.owner = owner;
 
         listModel = new EmployeeListModel();
@@ -48,16 +51,15 @@ public class ListEditor extends JPanel implements ListSelectionListener {
 
         cmbEmployeeType = new JComboBox<>(availableTypes.keySet().toArray(new String[availableTypes.size()]));
 
-        addButton = new JButton("Add");
-        addButton.addActionListener(e -> {
+        JButton addButton = new JButton("Add");
+        addButton.addActionListener(event -> {
             try {
                 Employee employee = availableTypes.get(getSelectedType()).newInstance();
                 new EditorWindow(owner, employee);
                 addEmployee(employee);
-            } catch (InstantiationException | IllegalAccessException e1){
-                e1.printStackTrace();
+            } catch (InstantiationException | IllegalAccessException e){
+                e.printStackTrace();
             }
-
         });
 
         removeButton = new JButton("Remove");
@@ -85,12 +87,27 @@ public class ListEditor extends JPanel implements ListSelectionListener {
         add(buttonPanel, BorderLayout.PAGE_END);
     }
 
-    public void addEmployee(Employee employee) {
+    private void addEmployee(Employee employee) {
         listModel.addElement(employee);
     }
 
-    private Object getSelectedType(){
-        return cmbEmployeeType.getSelectedItem();
+    private String getSelectedType(){
+        return (String)cmbEmployeeType.getSelectedItem();
+    }
+
+    void saveToFile(String fileName, Serializer serializer) throws IOException{
+        BufferedOutputStream out = new BufferedOutputStream(new FileOutputStream(fileName));
+        serializer.serialize(employeeList, out);
+        out.close();
+    }
+
+    @SuppressWarnings("unchecked")
+    void loadFromFile(String fileName, Serializer serializer) throws ClassNotFoundException, InstantiationException, IllegalAccessException, IOException, InvocationTargetException, NoSuchMethodException{
+        BufferedInputStream in = new BufferedInputStream(new FileInputStream(fileName));
+        List<Employee> loadedList = (List<Employee>)serializer.deserialize(in);
+        listModel.clear();
+        loadedList.forEach(this::addEmployee);
+        in.close();
     }
 
     @Override
@@ -109,17 +126,40 @@ public class ListEditor extends JPanel implements ListSelectionListener {
         }
     }
 
+    enum SerializerType {
+        BINARY {
+            @Override
+            public Serializer create() {
+                return new BinarySerializer();
+            }
+        },
+        CUSTOM {
+            @Override
+            public Serializer create() {
+                return new CustomTextSerializer();
+            }
+        },
+        XML {
+            @Override
+            public Serializer create() {
+                return new XMLSerializer();
+            }
+        };
+
+        abstract public Serializer create();
+    }
+
     private class EmployeeListModel extends DefaultListModel<Employee> {
         @Override
         public void addElement(Employee element) {
             super.addElement(element);
-            employeesList.addEmployee(element);
+            employeeList.add(element);
         }
 
         @Override
         public void removeRange(int fromIndex, int toIndex) {
             super.removeRange(fromIndex, toIndex);
-            employeesList.getEmployeeList().subList(fromIndex, toIndex).clear();
+            employeeList.subList(fromIndex, toIndex).clear();
         }
 
         @Override

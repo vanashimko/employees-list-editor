@@ -9,8 +9,8 @@ import java.awt.*;
 import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 
-public class EditorWindow extends JDialog {
-    public EditorWindow(Frame owner, Employee employee) {
+class EditorWindow extends JDialog {
+    EditorWindow(Frame owner, Employee employee) {
         super(owner, employee.getDescription(), true);
         EditorsPanel editorsPanel = new EditorsPanel(employee);
         add(new JScrollPane(editorsPanel));
@@ -22,7 +22,7 @@ public class EditorWindow extends JDialog {
     }
 
     private class EditorsPanel extends JPanel{
-        public EditorsPanel(Employee employee) {
+        EditorsPanel(Employee employee) {
             setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
             createEditors(employee);
         }
@@ -38,6 +38,7 @@ public class EditorWindow extends JDialog {
                         Object innerObject = field.getGetter().invoke(object);
                         if (innerObject == null){
                             innerObject = field.getGetter().getReturnType().newInstance();
+                            field.getSetter().invoke(object, innerObject);
                         }
                         createEditors(innerObject);
                     } catch (InvocationTargetException | IllegalAccessException | InstantiationException e){

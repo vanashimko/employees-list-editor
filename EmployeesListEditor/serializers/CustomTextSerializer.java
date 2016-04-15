@@ -78,7 +78,7 @@ public class CustomTextSerializer implements Serializer {
     }
 
     private Object readObject(String inputString) throws InstantiationException, IllegalAccessException, ClassNotFoundException, NoSuchMethodException, InvocationTargetException {
-        if (inputString.equals("null")){
+        if (inputString.equals("{null}")){
             return null;
         }
         int startIndex = inputString.indexOf('{') + 1;
@@ -116,7 +116,7 @@ public class CustomTextSerializer implements Serializer {
                     String fieldName = objectBlock.substring(endIndex, startIndex);
                     startIndex++;
                     endIndex = getBlockEnd(objectBlock, startIndex, '{', '}');
-                    Object fieldValue = readObject(objectBlock.substring(startIndex + 1, endIndex));
+                    Object fieldValue = readObject(objectBlock.substring(startIndex, endIndex + 1));
                     if (fieldValue != null) {
                         fields.put(fieldName, fieldValue);
                     }

@@ -1,6 +1,8 @@
 package EmployeesListEditor.employees.drivers;
 
-public class Car {
+import java.io.Serializable;
+
+public class Car implements Serializable{
     private String model;
     private String manufacturer;
     private String governmentNumber;
