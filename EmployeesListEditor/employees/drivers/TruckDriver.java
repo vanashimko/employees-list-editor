@@ -1,7 +1,6 @@
 package EmployeesListEditor.employees.drivers;
 
 import EmployeesListEditor.employees.Driver;
-import EmployeesListEditor.gui.EnumConstants;
 import EmployeesListEditor.gui.LocalizedName;
 
 @LocalizedName("Водитель грузовика")
