@@ -1,5 +1,7 @@
 package EmployeesListEditor.employees;
 
+import EmployeesListEditor.gui.LocalizedName;
+
 import java.io.Serializable;
 
 public abstract class Employee implements Serializable {
@@ -10,6 +12,7 @@ public abstract class Employee implements Serializable {
     private int hiringYear;
     private int yearOfBirth;
 
+    @LocalizedName("Фамилия")
     public String getSurname() {
         return surname;
     }
@@ -18,6 +21,7 @@ public abstract class Employee implements Serializable {
         this.surname = surname;
     }
 
+    @LocalizedName("Имя")
     public String getName() {
         return name;
     }
@@ -26,6 +30,7 @@ public abstract class Employee implements Serializable {
         this.name = name;
     }
 
+    @LocalizedName("Стаж")
     public int getStage() {
         return stage;
     }
@@ -34,6 +39,7 @@ public abstract class Employee implements Serializable {
         this.stage = stage;
     }
 
+    @LocalizedName("Год найма")
     public int getHiringYear() {
         return hiringYear;
     }
@@ -42,6 +48,7 @@ public abstract class Employee implements Serializable {
         this.hiringYear = hiringYear;
     }
 
+    @LocalizedName("Отчество")
     public String getMiddleName() {
         return middleName;
     }
@@ -50,6 +57,7 @@ public abstract class Employee implements Serializable {
         this.middleName = middleName;
     }
 
+    @LocalizedName("Год рождения")
     public int getYearOfBirth() {
         return yearOfBirth;
     }
@@ -59,19 +67,23 @@ public abstract class Employee implements Serializable {
     }
 
     public String getProfession() {
+        Class<? extends Employee> classType = getClass();
+        if (classType.isAnnotationPresent(LocalizedName.class)) {
+            return classType.getAnnotation(LocalizedName.class).value();
+        }
         return getClass().getSimpleName();
     }
 
     public String getDescription() {
         String name = getName();
-        name = (name == null)?"":name;
+        name = (name == null) ? "" : name;
 
         String surname = getSurname();
-        surname = (surname == null)?"":surname;
+        surname = (surname == null) ? "" : surname;
 
         String profession = getProfession();
         String result = String.join(" ", name, surname);
-        if (result.equals(" ")){
+        if (result.equals(" ")) {
             return profession;
         }
         return result;

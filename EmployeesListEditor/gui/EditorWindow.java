@@ -39,10 +39,13 @@ class EditorWindow extends JDialog {
             ArrayList<FieldDescription> fields = FieldsExtractor.getFields(object);
             for (FieldDescription field : fields){
                 if (field.getFieldType() == FieldDescription.FieldType.PRIMITIVE){
-                    add(new FieldViewer(object, field), BorderLayout.CENTER);
+                    add(new FieldViewer(object, field));
                 } else {
                     add(new JSeparator(JSeparator.HORIZONTAL));
-                    add(new JLabel(field.getName(), SwingConstants.CENTER));
+                    JLabel lblAggregatedClassName = new JLabel(field.getLocalizedName());
+                    lblAggregatedClassName.setAlignmentX(CENTER_ALIGNMENT);
+                    add(lblAggregatedClassName);
+
                     try {
                         Object innerObject = field.getGetter().invoke(object);
                         if (innerObject == null){

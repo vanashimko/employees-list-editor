@@ -20,18 +20,19 @@ class ListEditor extends JPanel implements ListSelectionListener {
     private EmployeeListModel listModel;
     private java.util.List<Employee> employeeList = new ArrayList<>();
 
+    private Map<Class<?>, String> classesLocalizedNames;
+
     private JButton removeButton;
     private JButton editButton;
 
-    private JComboBox<String> cmbEmployeeType;
+    private JComboBox<Class> cmbEmployeeType;
 
     private Frame owner;
 
-    ListEditor(Frame owner, Map<String, Class<? extends Employee>> availableTypes) {
+    ListEditor(Frame owner, Class<?>[] availableTypes) {
         super(new BorderLayout());
-
         this.owner = owner;
-
+        classesLocalizedNames = createLocalizedClassesNames(availableTypes);
         listModel = new EmployeeListModel();
         list = new JList<>(listModel);
         list.setSelectionMode(ListSelectionModel.SINGLE_INTERVAL_SELECTION);
@@ -49,12 +50,23 @@ class ListEditor extends JPanel implements ListSelectionListener {
         list.addListSelectionListener(this);
         JScrollPane listScrollPane = new JScrollPane(list);
 
-        cmbEmployeeType = new JComboBox<>(availableTypes.keySet().toArray(new String[availableTypes.size()]));
+        cmbEmployeeType = new JComboBox<>(availableTypes);
+        cmbEmployeeType.setRenderer(new DefaultListCellRenderer(){
+            @Override
+            public Component getListCellRendererComponent(JList<?> list, Object value, int index, boolean isSelected, boolean cellHasFocus) {
+                super.getListCellRendererComponent(list, value, index, isSelected, cellHasFocus);
+                if (value != null){
+                    Class<?> selectedClass = (Class<?>)value;
+                    setText(classesLocalizedNames.get(selectedClass));
+                }
+                return this;
+            }
+        });
 
-        JButton addButton = new JButton("Add");
+        JButton addButton = new JButton("Добавить");
         addButton.addActionListener(event -> {
             try {
-                Employee employee = availableTypes.get(getSelectedType()).newInstance();
+                Employee employee = (Employee)cmbEmployeeType.getItemAt(cmbEmployeeType.getSelectedIndex()).newInstance();
                 new EditorWindow(owner, employee);
                 addEmployee(employee);
             } catch (InstantiationException | IllegalAccessException e){
@@ -62,7 +74,7 @@ class ListEditor extends JPanel implements ListSelectionListener {
             }
         });
 
-        removeButton = new JButton("Remove");
+        removeButton = new JButton("Удалить");
         removeButton.setEnabled(false);
         removeButton.addActionListener(e -> {
             ListSelectionModel listSelectionModel = list.getSelectionModel();
@@ -71,7 +83,7 @@ class ListEditor extends JPanel implements ListSelectionListener {
             listModel.removeRange(fromIndex, toIndex);
         });
 
-        editButton = new JButton("Edit");
+        editButton = new JButton("Изменить");
         editButton.setEnabled(false);
         editButton.addActionListener(e -> {
             int index = list.getSelectedIndex();
@@ -95,6 +107,18 @@ class ListEditor extends JPanel implements ListSelectionListener {
 
     private String getSelectedType(){
         return (String)cmbEmployeeType.getSelectedItem();
+    }
+
+    private Map<Class<?>, String> createLocalizedClassesNames(Class[] classes){
+        Map<Class<?>, String> result = new HashMap<>();
+        for (Class<?> c : classes){
+            String className = c.getSimpleName();
+            if (c.isAnnotationPresent(LocalizedName.class)){
+                className = c.getAnnotation(LocalizedName.class).value();
+            }
+            result.put(c, className);
+        }
+        return result;
     }
 
     void saveToFile(String fileName, Serializer serializer) throws IOException{

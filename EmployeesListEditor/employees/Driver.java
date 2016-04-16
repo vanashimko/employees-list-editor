@@ -1,6 +1,7 @@
 package EmployeesListEditor.employees;
 
 import EmployeesListEditor.employees.drivers.Car;
+import EmployeesListEditor.gui.LocalizedName;
 
 public abstract class Driver extends Employee {
     public enum DriverLicenseType {
@@ -14,6 +15,7 @@ public abstract class Driver extends Employee {
     private DriverLicenseType driverLicenseType;
     private Car car;
 
+    @LocalizedName("Категория прав")
     public DriverLicenseType getDriverLicenseType() {
         return driverLicenseType;
     }
@@ -22,6 +24,7 @@ public abstract class Driver extends Employee {
         this.driverLicenseType = driverLicenseType;
     }
 
+    @LocalizedName("Автомобиль")
     public Car getCar() {
         return car;
     }
