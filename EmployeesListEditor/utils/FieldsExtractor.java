@@ -72,7 +72,7 @@ public class FieldsExtractor {
     }
 
     private static boolean isGetter(String methodName) {
-        return (methodName.startsWith("get") && !methodName.equals("getClass")) || (methodName.startsWith("is"));
+        return methodName.startsWith("get") || methodName.startsWith("is");
     }
 
     private static boolean isSetter(String methodName) {

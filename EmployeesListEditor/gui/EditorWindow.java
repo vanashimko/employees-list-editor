@@ -41,6 +41,7 @@ class EditorWindow extends JDialog {
                 if (field.getFieldType() == FieldDescription.FieldType.PRIMITIVE){
                     add(new FieldViewer(object, field), BorderLayout.CENTER);
                 } else {
+                    add(new JSeparator(JSeparator.HORIZONTAL));
                     add(new JLabel(field.getName(), SwingConstants.CENTER));
                     try {
                         Object innerObject = field.getGetter().invoke(object);
