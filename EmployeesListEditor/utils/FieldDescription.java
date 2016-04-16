@@ -18,7 +18,7 @@ public class FieldDescription {
         return getter;
     }
 
-    public void setGetter(Method getter) {
+    void setGetter(Method getter) {
         this.getter = getter;
     }
 
@@ -26,11 +26,11 @@ public class FieldDescription {
         return setter;
     }
 
-    public void setSetter(Method setter) {
+    void setSetter(Method setter) {
         this.setter = setter;
     }
 
-    public FieldDescription(String name) {
+    FieldDescription(String name) {
         this.name = name;
     }
 
@@ -42,7 +42,7 @@ public class FieldDescription {
         return classType;
     }
 
-    public void setClassType(Class<?> classType) {
+    void setClassType(Class<?> classType) {
         this.classType = classType;
     }
 

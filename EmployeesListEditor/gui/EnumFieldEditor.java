@@ -4,27 +4,14 @@ import EmployeesListEditor.utils.FieldDescription;
 
 import javax.swing.*;
 import java.awt.event.ItemEvent;
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
 
-public class EnumFieldEditor extends FieldEditor {
+class EnumFieldEditor extends FieldEditor {
     private JComboBox<Enum> comboBox;
-    private Enum[] enumValues;
 
-    private static Enum[] getEnumValues(Class<?> enumType) {
-        try {
-            Method values = enumType.getMethod("values");
-            return (Enum[]) values.invoke(null);
-        } catch (NoSuchMethodException | IllegalAccessException | InvocationTargetException e) {
-            e.printStackTrace();
-        }
-        return null;
-    }
-
-    public EnumFieldEditor(Object o, FieldDescription fieldDescription) {
+    EnumFieldEditor(Object o, FieldDescription fieldDescription) {
         this.object = o;
         this.fieldDescription = fieldDescription;
-        enumValues = (Enum[])fieldDescription.getClassType().getEnumConstants();
+        Enum[] enumValues = (Enum[]) fieldDescription.getClassType().getEnumConstants();
         comboBox = new JComboBox<>(enumValues);
         getValueFromObject();
         comboBox.addItemListener(e -> {

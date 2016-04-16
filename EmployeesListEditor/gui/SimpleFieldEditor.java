@@ -6,10 +6,10 @@ import javax.swing.*;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 
-public class SimpleFieldEditor extends FieldEditor {
+class SimpleFieldEditor extends FieldEditor {
     private JTextField textField;
 
-    public SimpleFieldEditor(Object o, FieldDescription fieldDescription){
+    SimpleFieldEditor(Object o, FieldDescription fieldDescription){
         this.object = o;
         this.fieldDescription = fieldDescription;
         textField = new JTextField();

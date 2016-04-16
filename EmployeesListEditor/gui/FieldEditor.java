@@ -6,8 +6,6 @@ import EmployeesListEditor.utils.ReflectHelper;
 
 import javax.swing.*;
 import java.lang.reflect.InvocationTargetException;
-import java.util.HashMap;
-import java.util.Map;
 
 abstract class FieldEditor {
     FieldDescription fieldDescription;

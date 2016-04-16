@@ -5,8 +5,8 @@ import EmployeesListEditor.utils.FieldsExtractor;
 
 import javax.swing.*;
 
-public class FieldViewer extends JPanel {
-    public FieldViewer(Object object, FieldDescription fieldDescription) {
+class FieldViewer extends JPanel {
+    FieldViewer(Object object, FieldDescription fieldDescription) {
         GroupLayout layout = new GroupLayout(this);
         setLayout(layout);
 
