@@ -28,7 +28,7 @@ abstract class FieldEditor {
     void saveValueToObject() {
         try {
             String controlData = readFromControl();
-            if (controlData.isEmpty()) {
+            if (controlData.isEmpty() && !fieldDescription.getClassType().equals(String.class)) {
                 return;
             }
             fieldDescription.setFieldValue(ReflectHelper.createPrimitiveObject(fieldDescription.getClassType(), controlData));

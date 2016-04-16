@@ -63,6 +63,7 @@ class ListEditor extends JPanel implements ListSelectionListener {
         });
 
         removeButton = new JButton("Remove");
+        removeButton.setEnabled(false);
         removeButton.addActionListener(e -> {
             ListSelectionModel listSelectionModel = list.getSelectionModel();
             int fromIndex = listSelectionModel.getMinSelectionIndex();
@@ -71,6 +72,7 @@ class ListEditor extends JPanel implements ListSelectionListener {
         });
 
         editButton = new JButton("Edit");
+        editButton.setEnabled(false);
         editButton.addActionListener(e -> {
             int index = list.getSelectedIndex();
             Employee element = listModel.getElementAt(index);
