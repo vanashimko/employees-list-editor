@@ -16,7 +16,7 @@ public class CustomTextSerializer implements Serializer {
     private int nestingLevel = 0;
     @Override
     public void serialize(Object o, OutputStream outputStream) throws IOException {
-        OutputStreamWriter outputStreamWriter = new OutputStreamWriter(outputStream);
+        OutputStreamWriter outputStreamWriter = new OutputStreamWriter(outputStream, "UTF-8");
         nestingLevel = 0;
         writeObject(o, outputStreamWriter);
         outputStreamWriter.close();
@@ -25,7 +25,7 @@ public class CustomTextSerializer implements Serializer {
 
     @Override
     public Object deserialize(InputStream inputStream) throws IOException, ClassNotFoundException, InstantiationException, IllegalAccessException, InvocationTargetException, NoSuchMethodException {
-        Scanner scanner = new Scanner(inputStream).useDelimiter("\\A");
+        Scanner scanner = new Scanner(inputStream, "UTF-8").useDelimiter("\\A");
         String inputString = clearWhitespaces(scanner.next());
         return readObject(inputString);
     }
