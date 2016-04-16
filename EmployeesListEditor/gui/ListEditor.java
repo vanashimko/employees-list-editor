@@ -15,7 +15,7 @@ import java.lang.reflect.InvocationTargetException;
 import java.util.*;
 import java.util.List;
 
-public class ListEditor extends JPanel implements ListSelectionListener {
+class ListEditor extends JPanel implements ListSelectionListener {
     private JList<Employee> list;
     private EmployeeListModel listModel;
     private java.util.List<Employee> employeeList = new ArrayList<>();
@@ -106,6 +106,7 @@ public class ListEditor extends JPanel implements ListSelectionListener {
         BufferedInputStream in = new BufferedInputStream(new FileInputStream(fileName));
         List<Employee> loadedList = (List<Employee>)serializer.deserialize(in);
         listModel.clear();
+        employeeList.clear();
         loadedList.forEach(this::addEmployee);
         in.close();
     }
