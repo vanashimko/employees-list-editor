@@ -1,10 +1,13 @@
 package EmployeesListEditor.gui;
 
 import EmployeesListEditor.utils.FieldDescription;
+import EmployeesListEditor.utils.FieldsExtractor;
 import EmployeesListEditor.utils.ReflectHelper;
 
 import javax.swing.*;
 import java.lang.reflect.InvocationTargetException;
+import java.util.HashMap;
+import java.util.Map;
 
 abstract class FieldEditor {
     FieldDescription fieldDescription;
@@ -28,8 +31,8 @@ abstract class FieldEditor {
     void saveValueToObject() {
         try {
             String controlData = readFromControl();
-            if (controlData.isEmpty() && !fieldDescription.getClassType().equals(String.class)) {
-                return;
+            if (controlData.isEmpty()) {
+                controlData = getDefaultValue(fieldDescription.getClassType());
             }
             fieldDescription.setFieldValue(ReflectHelper.createPrimitiveObject(fieldDescription.getClassType(), controlData));
             fieldDescription.getSetter().invoke(object, fieldDescription.getFieldValue());
@@ -38,5 +41,15 @@ abstract class FieldEditor {
         } catch (NoSuchMethodException | IllegalAccessException | ClassNotFoundException e) {
             e.printStackTrace();
         }
+    }
+
+    private String getDefaultValue(Class<?> classType){
+        if (FieldsExtractor.isBoxed(classType)){
+            if (classType.equals(Boolean.class)){
+                return "false";
+            }
+            return "0";
+        }
+        return "";
     }
 }
