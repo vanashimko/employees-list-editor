@@ -19,7 +19,7 @@ class FieldViewer extends JPanel {
         GroupLayout.ParallelGroup btnVerticalGroup = layout.createParallelGroup(GroupLayout.Alignment.CENTER);
         layout.setVerticalGroup(btnVerticalGroup);
 
-        JLabel lblFieldName = new JLabel(fieldDescription.getName());
+        JLabel lblFieldName = new JLabel(fieldDescription.getLocalizedName());
         btnHorizontalGroup.addComponent(lblFieldName);
         btnVerticalGroup.addComponent(lblFieldName);
 

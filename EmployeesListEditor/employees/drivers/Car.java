@@ -1,5 +1,7 @@
 package EmployeesListEditor.employees.drivers;
 
+import EmployeesListEditor.gui.LocalizedName;
+
 import java.io.Serializable;
 
 public class Car implements Serializable{
@@ -7,6 +9,7 @@ public class Car implements Serializable{
     private String manufacturer;
     private String governmentNumber;
 
+    @LocalizedName("Модель")
     public String getModel() {
         return model;
     }
@@ -15,6 +18,7 @@ public class Car implements Serializable{
         this.model = model;
     }
 
+    @LocalizedName("Производитель")
     public String getManufacturer() {
         return manufacturer;
     }
@@ -23,6 +27,7 @@ public class Car implements Serializable{
         this.manufacturer = manufacturer;
     }
 
+    @LocalizedName("Государственный номер")
     public String getGovernmentNumber() {
         return governmentNumber;
     }

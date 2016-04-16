@@ -11,33 +11,25 @@ import EmployeesListEditor.serializers.Serializer;
 
 import javax.swing.*;
 import java.awt.*;
-import java.util.HashMap;
-import java.util.Map;
 
 public class MainWindow extends JFrame {
     public MainWindow() {
         super("Лабораторная работа №3");
         setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
-        setMinimumSize(new Dimension(400, 300));
+        setMinimumSize(new Dimension(450, 300));
         setLocationRelativeTo(null);
 
-        Map<String, Class<? extends Employee>> availableTypes = new HashMap<>();
-        availableTypes.put("Personal driver", PersonalDriver.class);
-        availableTypes.put("Truck driver", TruckDriver.class);
-        availableTypes.put("Programmer", Programmer.class);
-        availableTypes.put("Technologist", Technologist.class);
-        availableTypes.put("Fitter", Fitter.class);
-        availableTypes.put("Machine operator", MachineOperator.class);
+        Class[] availableTypes = {PersonalDriver.class, TruckDriver.class, Programmer.class, Technologist.class, Fitter.class, MachineOperator.class};
 
         ListEditor employeesListEditor = new ListEditor(this, availableTypes);
         add(employeesListEditor);
 
         JMenuBar jmbMain = new JMenuBar();
 
-        JMenu jmFile = new JMenu("File");
+        JMenu jmFile = new JMenu("Файл");
         jmbMain.add(jmFile);
 
-        JMenuItem jmiOpen = new JMenuItem("Open");
+        JMenuItem jmiOpen = new JMenuItem("Открыть");
         jmiOpen.addActionListener(event -> {
             FilePicker filePicker = new FilePicker();
 
@@ -47,13 +39,13 @@ public class MainWindow extends JFrame {
                 try {
                     employeesListEditor.loadFromFile(fileName, serializer);
                 } catch (Exception e) {
-                    JOptionPane.showMessageDialog(null, "Error while loading", "Fatal error", JOptionPane.ERROR_MESSAGE);
+                    JOptionPane.showMessageDialog(null, "Ошибка загрузки списка, файл поврежден", "Ошибка", JOptionPane.ERROR_MESSAGE);
                     e.printStackTrace();
                 }
             }
         });
 
-        JMenuItem jmiSave = new JMenuItem("Save");
+        JMenuItem jmiSave = new JMenuItem("Сохранить");
         jmiSave.addActionListener(event -> {
             FilePicker filePicker = new FilePicker();
 
@@ -73,7 +65,7 @@ public class MainWindow extends JFrame {
                 try {
                     employeesListEditor.saveToFile(fileName, serializer);
                 } catch (Exception e) {
-                    JOptionPane.showMessageDialog(null, "Error while saving", "Fatal error", JOptionPane.ERROR_MESSAGE);
+                    JOptionPane.showMessageDialog(null, "Невозможно сохранить список", "Ошибка", JOptionPane.ERROR_MESSAGE);
                     e.printStackTrace();
                 }
             }

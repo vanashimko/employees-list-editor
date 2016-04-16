@@ -1,21 +1,31 @@
 package EmployeesListEditor.utils;
 
+import EmployeesListEditor.gui.LocalizedName;
+
 import java.lang.reflect.Method;
 
 public class FieldDescription {
     public enum FieldType {
         PRIMITIVE,
         LIST,
-        OBJECT,
+        OBJECT
     }
 
     private String name;
+
     private Class<?> classType;
     private Object fieldValue;
     private Method getter, setter;
 
     public Method getGetter() {
         return getter;
+    }
+
+    public String getLocalizedName() {
+        if (getter.isAnnotationPresent(LocalizedName.class)) {
+            return getter.getAnnotation(LocalizedName.class).value();
+        }
+        return getName();
     }
 
     void setGetter(Method getter) {
@@ -50,7 +60,7 @@ public class FieldDescription {
         return classType.getName();
     }
 
-    public FieldType getFieldType(){
+    public FieldType getFieldType() {
         return FieldsExtractor.getFieldType(getClassType());
     }
 
@@ -61,5 +71,6 @@ public class FieldDescription {
     public void setFieldValue(Object fieldValue) {
         this.fieldValue = fieldValue;
     }
+
 
 }
