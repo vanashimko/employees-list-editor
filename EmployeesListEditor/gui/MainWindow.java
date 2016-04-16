@@ -1,6 +1,5 @@
 package EmployeesListEditor.gui;
 
-import EmployeesListEditor.employees.Employee;
 import EmployeesListEditor.employees.drivers.PersonalDriver;
 import EmployeesListEditor.employees.drivers.TruckDriver;
 import EmployeesListEditor.employees.engineers.Programmer;

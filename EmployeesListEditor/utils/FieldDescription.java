@@ -56,10 +56,6 @@ public class FieldDescription {
         this.classType = classType;
     }
 
-    public String getClassName() {
-        return classType.getName();
-    }
-
     public FieldType getFieldType() {
         return FieldsExtractor.getFieldType(getClassType());
     }

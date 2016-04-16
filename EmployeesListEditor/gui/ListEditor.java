@@ -105,10 +105,6 @@ class ListEditor extends JPanel implements ListSelectionListener {
         listModel.addElement(employee);
     }
 
-    private String getSelectedType(){
-        return (String)cmbEmployeeType.getSelectedItem();
-    }
-
     private Map<Class<?>, String> createLocalizedClassesNames(Class[] classes){
         Map<Class<?>, String> result = new HashMap<>();
         for (Class<?> c : classes){
