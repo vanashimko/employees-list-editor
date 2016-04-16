@@ -3,16 +3,14 @@ package EmployeesListEditor;
 import EmployeesListEditor.gui.MainWindow;
 
 import javax.swing.*;
-import javax.swing.plaf.nimbus.NimbusLookAndFeel;
 
 public class Main {
-    private static void setSystemLookAndFeel() {
+    private static void setLookAndFeel() {
         try {
-            for (UIManager.LookAndFeelInfo info : UIManager.getInstalledLookAndFeels()) {
-                if ("Nimbus".equals(info.getName())) {
-                    UIManager.setLookAndFeel(info.getClassName());
-                    break;
-                }
+            if (System.getProperty("os.name").equals("Linux")) {
+                UIManager.setLookAndFeel("com.sun.java.swing.plaf.gtk.GTKLookAndFeel");
+            } else {
+                UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
             }
         } catch (Exception e) {
             System.err.println("Error while changing Look and Feel");
@@ -20,7 +18,7 @@ public class Main {
     }
 
     public static void main(String[] args) {
-        setSystemLookAndFeel();
+        setLookAndFeel();
         new MainWindow();
     }
 }
