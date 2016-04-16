@@ -6,18 +6,26 @@ import EmployeesListEditor.utils.FieldsExtractor;
 
 import javax.swing.*;
 import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 
 class EditorWindow extends JDialog {
     EditorWindow(Frame owner, Employee employee) {
         super(owner, employee.getDescription(), true);
+        JPanel mainPanel = new JPanel(new BorderLayout());
+        Container p = getContentPane();
+        p.add(mainPanel);
         EditorsPanel editorsPanel = new EditorsPanel(employee);
-        add(new JScrollPane(editorsPanel));
+        mainPanel.add(new JScrollPane(editorsPanel), BorderLayout.CENTER);
         setMinimumSize(new Dimension(300, getPreferredSize().height));
-
+        JButton btnOK = new JButton("OK");
+        btnOK.addActionListener(e -> EditorWindow.this.setVisible(false));
+        mainPanel.add(btnOK, BorderLayout.PAGE_END);
         setResizable(false);
         setLocationRelativeTo(null);
+        pack();
         setVisible(true);
     }
 
