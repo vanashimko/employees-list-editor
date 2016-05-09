@@ -6,6 +6,6 @@ import java.io.OutputStream;
 import java.lang.reflect.InvocationTargetException;
 
 public interface Serializer {
-    void serialize(Object o, OutputStream outputStream) throws IOException;
-    Object deserialize(InputStream inputStream) throws IOException, ClassNotFoundException, InstantiationException, IllegalAccessException, InvocationTargetException, NoSuchMethodException;
+    void serialize(Object o, OutputStream outputStream) throws SerializationException;
+    Object deserialize(InputStream inputStream) throws SerializationException;
 }

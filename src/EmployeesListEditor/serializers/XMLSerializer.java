@@ -8,18 +8,26 @@ import java.io.OutputStream;
 
 public class XMLSerializer implements Serializer {
     @Override
-    public void serialize(Object o, OutputStream outputStream) throws IOException {
-        XMLEncoder xmlEncoder = new XMLEncoder(outputStream);
-        xmlEncoder.writeObject(o);
-        xmlEncoder.close();
+    public void serialize(Object o, OutputStream outputStream) throws SerializationException {
+        try {
+            XMLEncoder xmlEncoder = new XMLEncoder(outputStream);
+            xmlEncoder.writeObject(o);
+            xmlEncoder.close();
+        } catch (Exception e){
+            throw new SerializationException(e);
+        }
     }
 
     @Override
-    public Object deserialize(InputStream inputStream) throws IOException, ClassNotFoundException {
+    public Object deserialize(InputStream inputStream) throws SerializationException {
         Object o;
-        XMLDecoder xmlDecoder = new XMLDecoder(inputStream);
-        o = xmlDecoder.readObject();
-        xmlDecoder.close();
+        try {
+            XMLDecoder xmlDecoder = new XMLDecoder(inputStream);
+            o = xmlDecoder.readObject();
+            xmlDecoder.close();
+        } catch (Exception e) {
+            throw new SerializationException(e);
+        }
         return o;
     }
 }

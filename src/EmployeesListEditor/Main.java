@@ -24,13 +24,9 @@ public class Main {
         }
     }
 
-    public static void main(String[] args) {
-//        setLookAndFeel();
-//        new MainWindow();
-//        System.out.println("hello, world");
+    private static void testPlugins() {
         File pluginsFolder = new File("plugins");
         File [] jars = pluginsFolder.listFiles(file -> file.isFile() && file.getName().endsWith(".jar"));
-//        System.out.println(jars.length);
         List<PluginInfo> plugins = new ArrayList<>();
         for (File file : jars){
             try{
@@ -43,5 +39,10 @@ public class Main {
         for (PluginInfo pluginInfo : plugins){
             pluginInfo.getInstance().test();
         }
+    }
+
+    public static void main(String[] args) {
+        setLookAndFeel();
+        new MainWindow();
     }
 }

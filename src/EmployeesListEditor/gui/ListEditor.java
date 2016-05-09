@@ -1,10 +1,7 @@
 package EmployeesListEditor.gui;
 
 import EmployeesListEditor.employees.Employee;
-import EmployeesListEditor.serializers.BinarySerializer;
-import EmployeesListEditor.serializers.CustomTextSerializer;
-import EmployeesListEditor.serializers.Serializer;
-import EmployeesListEditor.serializers.XMLSerializer;
+import EmployeesListEditor.serializers.*;
 
 import javax.swing.*;
 import javax.swing.event.ListSelectionEvent;
@@ -117,14 +114,14 @@ class ListEditor extends JPanel implements ListSelectionListener {
         return result;
     }
 
-    void saveToFile(String fileName, Serializer serializer) throws IOException{
+    void saveToFile(String fileName, Serializer serializer) throws SerializationException, IOException{
         BufferedOutputStream out = new BufferedOutputStream(new FileOutputStream(fileName));
         serializer.serialize(employeeList, out);
         out.close();
     }
 
     @SuppressWarnings("unchecked")
-    void loadFromFile(String fileName, Serializer serializer) throws ClassNotFoundException, InstantiationException, IllegalAccessException, IOException, InvocationTargetException, NoSuchMethodException{
+    void loadFromFile(String fileName, Serializer serializer) throws SerializationException, IOException{
         BufferedInputStream in = new BufferedInputStream(new FileInputStream(fileName));
         List<Employee> loadedList = (List<Employee>)serializer.deserialize(in);
         listModel.clear();

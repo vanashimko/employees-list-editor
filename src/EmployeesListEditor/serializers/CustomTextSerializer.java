@@ -15,19 +15,29 @@ import java.util.*;
 public class CustomTextSerializer implements Serializer {
     private int nestingLevel = 0;
     @Override
-    public void serialize(Object o, OutputStream outputStream) throws IOException {
-        OutputStreamWriter outputStreamWriter = new OutputStreamWriter(outputStream, "UTF-8");
-        nestingLevel = 0;
-        writeObject(o, outputStreamWriter);
-        outputStreamWriter.close();
+    public void serialize(Object o, OutputStream outputStream) throws SerializationException {
+        try {
+            OutputStreamWriter outputStreamWriter = new OutputStreamWriter(outputStream, "UTF-8");
+            nestingLevel = 0;
+            writeObject(o, outputStreamWriter);
+            outputStreamWriter.flush();
+        } catch (Exception e) {
+            throw new SerializationException(e);
+        }
 
     }
 
     @Override
-    public Object deserialize(InputStream inputStream) throws IOException, ClassNotFoundException, InstantiationException, IllegalAccessException, InvocationTargetException, NoSuchMethodException {
+    public Object deserialize(InputStream inputStream) throws SerializationException {
         Scanner scanner = new Scanner(inputStream, "UTF-8").useDelimiter("\\A");
         String inputString = clearWhitespaces(scanner.next());
-        return readObject(inputString);
+        Object result;
+        try {
+            result = readObject(inputString);
+        } catch (Exception e){
+            throw new SerializationException(e);
+        }
+        return result;
     }
 
     private void writeObject(Object o, OutputStreamWriter outputStreamWriter) throws IOException {

@@ -7,7 +7,7 @@ public class PluginLoadException extends Exception {
         super(message);
     }
 
-    public PluginLoadException(Exception e){
-        super(e);
+    public PluginLoadException(Throwable cause){
+        super(cause);
     }
 }

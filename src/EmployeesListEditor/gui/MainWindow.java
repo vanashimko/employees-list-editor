@@ -6,10 +6,12 @@ import EmployeesListEditor.employees.engineers.Programmer;
 import EmployeesListEditor.employees.engineers.Technologist;
 import EmployeesListEditor.employees.workers.Fitter;
 import EmployeesListEditor.employees.workers.MachineOperator;
+import EmployeesListEditor.serializers.SerializationException;
 import EmployeesListEditor.serializers.Serializer;
 
 import javax.swing.*;
 import java.awt.*;
+import java.io.IOException;
 
 public class MainWindow extends JFrame {
     public MainWindow() {
@@ -37,8 +39,11 @@ public class MainWindow extends JFrame {
                 Serializer serializer = filePicker.getSerializerType().create();
                 try {
                     employeesListEditor.loadFromFile(fileName, serializer);
-                } catch (Exception e) {
-                    JOptionPane.showMessageDialog(null, "Ошибка загрузки списка, файл поврежден", "Ошибка", JOptionPane.ERROR_MESSAGE);
+                } catch (IOException e) {
+                    JOptionPane.showMessageDialog(null, "Ошибка чтения из файла", "Ошибка", JOptionPane.ERROR_MESSAGE);
+                    e.printStackTrace();
+                } catch (SerializationException e){
+                    JOptionPane.showMessageDialog(null, "Ошибка десериализации ", "Ошибка", JOptionPane.ERROR_MESSAGE);
                     e.printStackTrace();
                 }
             }
@@ -63,8 +68,11 @@ public class MainWindow extends JFrame {
                 Serializer serializer = filePicker.getSerializerType().create();
                 try {
                     employeesListEditor.saveToFile(fileName, serializer);
-                } catch (Exception e) {
-                    JOptionPane.showMessageDialog(null, "Невозможно сохранить список", "Ошибка", JOptionPane.ERROR_MESSAGE);
+                } catch (SerializationException e) {
+                    JOptionPane.showMessageDialog(null, "Ошибка сериализации", "Ошибка", JOptionPane.ERROR_MESSAGE);
+                    e.printStackTrace();
+                } catch (IOException e){
+                    JOptionPane.showMessageDialog(null, "Ошибка записи в файл", "Ошибка", JOptionPane.ERROR_MESSAGE);
                     e.printStackTrace();
                 }
             }
