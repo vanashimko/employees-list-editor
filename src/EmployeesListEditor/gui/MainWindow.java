@@ -39,11 +39,11 @@ public class MainWindow extends JFrame {
                 Serializer serializer = filePicker.getSerializerType().create();
                 try {
                     employeesListEditor.loadFromFile(fileName, serializer);
-                } catch (IOException e) {
-                    JOptionPane.showMessageDialog(null, "Ошибка чтения из файла", "Ошибка", JOptionPane.ERROR_MESSAGE);
-                    e.printStackTrace();
                 } catch (SerializationException e){
                     JOptionPane.showMessageDialog(null, "Ошибка десериализации ", "Ошибка", JOptionPane.ERROR_MESSAGE);
+                    e.printStackTrace();
+                } catch (IOException e) {
+                    JOptionPane.showMessageDialog(null, "Ошибка чтения из файла", "Ошибка", JOptionPane.ERROR_MESSAGE);
                     e.printStackTrace();
                 }
             }
