@@ -6,6 +6,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 
+@SerializerInfo(name = "XML", extension = "xml")
 public class XMLSerializer implements Serializer {
     @Override
     public void serialize(Object o, OutputStream outputStream) throws SerializationException {

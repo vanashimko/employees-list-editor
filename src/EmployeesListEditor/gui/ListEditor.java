@@ -146,29 +146,6 @@ class ListEditor extends JPanel implements ListSelectionListener {
         }
     }
 
-    enum SerializerType {
-        BINARY {
-            @Override
-            public Serializer create() {
-                return new BinarySerializer();
-            }
-        },
-        CUSTOM {
-            @Override
-            public Serializer create() {
-                return new CustomTextSerializer();
-            }
-        },
-        XML {
-            @Override
-            public Serializer create() {
-                return new XMLSerializer();
-            }
-        };
-
-        abstract public Serializer create();
-    }
-
     private class EmployeeListModel extends DefaultListModel<Employee> {
         @Override
         public void addElement(Employee element) {

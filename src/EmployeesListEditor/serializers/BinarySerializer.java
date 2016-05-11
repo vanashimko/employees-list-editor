@@ -2,6 +2,7 @@ package EmployeesListEditor.serializers;
 
 import java.io.*;
 
+@SerializerInfo(name = "Binary", extension = "bin")
 public class BinarySerializer implements Serializer {
 
     @Override

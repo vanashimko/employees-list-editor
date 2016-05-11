@@ -30,8 +30,8 @@ public class PluginInfo {
 
             URL jarURL = file.toURI().toURL();
             URLClassLoader classLoader = new URLClassLoader(new URL[]{jarURL});
-            Class pluginClasss = classLoader.loadClass(pluginClassName);
-            instance = (Plugin) pluginClasss.newInstance();
+            Class pluginClass = classLoader.loadClass(pluginClassName);
+            instance = (Plugin) pluginClass.newInstance();
         } catch (Exception e){
             throw new PluginLoadException(e);
         }
