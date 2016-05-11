@@ -9,8 +9,8 @@ import java.awt.*;
 import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 
-class EditorWindow extends JDialog {
-    EditorWindow(Frame owner, Employee employee) {
+public class EditorWindow extends JDialog {
+    public EditorWindow(Frame owner, Employee employee) {
         super(owner, employee.getDescription(), true);
         JPanel mainPanel = new JPanel(new BorderLayout());
         Container p = getContentPane();

@@ -1,36 +1,40 @@
 package EmployeesListEditor.gui;
 
 import EmployeesListEditor.employees.Employee;
-import EmployeesListEditor.serializers.*;
+import EmployeesListEditor.gui.commands.ListCommandAdd;
+import EmployeesListEditor.gui.commands.ListCommand;
+import EmployeesListEditor.gui.commands.ListCommandEdit;
+import EmployeesListEditor.gui.commands.ListCommandRemoveRange;
+import EmployeesListEditor.serializers.SerializationException;
+import EmployeesListEditor.serializers.Serializer;
 
 import javax.swing.*;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 import java.awt.*;
 import java.io.*;
-import java.lang.reflect.InvocationTargetException;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 class ListEditor extends JPanel implements ListSelectionListener {
     private JList<Employee> list;
-    private EmployeeListModel listModel;
-    private java.util.List<Employee> employeeList = new ArrayList<>();
+    private DefaultListModel<Employee> listModel;
+    private List<Employee> employeeList = new ArrayList<>();
 
     private Map<Class<?>, String> classesLocalizedNames;
 
     private JButton removeButton;
     private JButton editButton;
 
-    private JComboBox<Class> cmbEmployeeType;
+    private JComboBox<Class<? extends Employee>> cmbEmployeeType;
 
-    private Frame owner;
-
+    @SuppressWarnings("unchecked")
     ListEditor(Frame owner, List<Class<? extends Employee>> availableTypes) {
         super(new BorderLayout());
-        this.owner = owner;
         classesLocalizedNames = createLocalizedClassesNames(availableTypes);
-        listModel = new EmployeeListModel();
+        listModel = new DefaultListModel<>();
         list = new JList<>(listModel);
         list.setSelectionMode(ListSelectionModel.SINGLE_INTERVAL_SELECTION);
         add(list);
@@ -48,12 +52,12 @@ class ListEditor extends JPanel implements ListSelectionListener {
         JScrollPane listScrollPane = new JScrollPane(list);
 
         cmbEmployeeType = new JComboBox<>(availableTypes.toArray(new Class[]{}));
-        cmbEmployeeType.setRenderer(new DefaultListCellRenderer(){
+        cmbEmployeeType.setRenderer(new DefaultListCellRenderer() {
             @Override
             public Component getListCellRendererComponent(JList<?> list, Object value, int index, boolean isSelected, boolean cellHasFocus) {
                 super.getListCellRendererComponent(list, value, index, isSelected, cellHasFocus);
-                if (value != null){
-                    Class<?> selectedClass = (Class<?>)value;
+                if (value != null) {
+                    Class<?> selectedClass = (Class<?>) value;
                     setText(classesLocalizedNames.get(selectedClass));
                 }
                 return this;
@@ -61,32 +65,15 @@ class ListEditor extends JPanel implements ListSelectionListener {
         });
 
         JButton addButton = new JButton("Добавить");
-        addButton.addActionListener(event -> {
-            try {
-                Employee employee = (Employee)cmbEmployeeType.getItemAt(cmbEmployeeType.getSelectedIndex()).newInstance();
-                new EditorWindow(owner, employee);
-                addEmployee(employee);
-            } catch (InstantiationException | IllegalAccessException e){
-                e.printStackTrace();
-            }
-        });
+        addButton.addActionListener(event -> executeCommand(new ListCommandAdd(getSelectedEmployeeType(), listModel, employeeList, owner)));
 
         removeButton = new JButton("Удалить");
         removeButton.setEnabled(false);
-        removeButton.addActionListener(e -> {
-            ListSelectionModel listSelectionModel = list.getSelectionModel();
-            int fromIndex = listSelectionModel.getMinSelectionIndex();
-            int toIndex = listSelectionModel.getMaxSelectionIndex();
-            listModel.removeRange(fromIndex, toIndex);
-        });
+        removeButton.addActionListener(e -> executeCommand(new ListCommandRemoveRange(listModel, employeeList, list.getMinSelectionIndex(), list.getMaxSelectionIndex())));
 
         editButton = new JButton("Изменить");
         editButton.setEnabled(false);
-        editButton.addActionListener(e -> {
-            int index = list.getSelectedIndex();
-            Employee element = listModel.getElementAt(index);
-            listModel.setElementAt(element, index);
-        });
+        editButton.addActionListener(e -> executeCommand(new ListCommandEdit(listModel, list.getSelectedIndex(), owner)));
 
         JPanel buttonPanel = new JPanel();
         buttonPanel.add(addButton);
@@ -98,15 +85,17 @@ class ListEditor extends JPanel implements ListSelectionListener {
         add(buttonPanel, BorderLayout.PAGE_END);
     }
 
-    private void addEmployee(Employee employee) {
+    @Deprecated
+    public void addEmployee(Employee employee) {
         listModel.addElement(employee);
+        employeeList.add(employee);
     }
 
-    private Map<Class<?>, String> createLocalizedClassesNames(List<Class<? extends Employee>> classes){
+    private Map<Class<?>, String> createLocalizedClassesNames(List<Class<? extends Employee>> classes) {
         Map<Class<?>, String> result = new HashMap<>();
-        for (Class<?> c : classes){
+        for (Class<?> c : classes) {
             String className = c.getSimpleName();
-            if (c.isAnnotationPresent(LocalizedName.class)){
+            if (c.isAnnotationPresent(LocalizedName.class)) {
                 className = c.getAnnotation(LocalizedName.class).value();
             }
             result.put(c, className);
@@ -114,20 +103,29 @@ class ListEditor extends JPanel implements ListSelectionListener {
         return result;
     }
 
-    void saveToFile(String fileName, Serializer serializer) throws SerializationException, IOException{
+    void saveToFile(String fileName, Serializer serializer) throws SerializationException, IOException {
         BufferedOutputStream out = new BufferedOutputStream(new FileOutputStream(fileName));
         serializer.serialize(employeeList, out);
         out.close();
     }
 
     @SuppressWarnings("unchecked")
-    void loadFromFile(String fileName, Serializer serializer) throws SerializationException, IOException{
+    void loadFromFile(String fileName, Serializer serializer) throws SerializationException, IOException {
         BufferedInputStream in = new BufferedInputStream(new FileInputStream(fileName));
-        List<Employee> loadedList = (List<Employee>)serializer.deserialize(in);
+        List<Employee> loadedList = (List<Employee>) serializer.deserialize(in);
         listModel.clear();
         employeeList.clear();
         loadedList.forEach(this::addEmployee);
         in.close();
+
+    }
+
+    public void executeCommand(ListCommand command) {
+        command.execute();
+    }
+
+    private Class<? extends Employee> getSelectedEmployeeType() {
+        return cmbEmployeeType.getItemAt(cmbEmployeeType.getSelectedIndex());
     }
 
     @Override
@@ -143,26 +141,6 @@ class ListEditor extends JPanel implements ListSelectionListener {
                 editButton.setEnabled(true);
                 removeButton.setEnabled(true);
             }
-        }
-    }
-
-    private class EmployeeListModel extends DefaultListModel<Employee> {
-        @Override
-        public void addElement(Employee element) {
-            super.addElement(element);
-            employeeList.add(element);
-        }
-
-        @Override
-        public void removeRange(int fromIndex, int toIndex) {
-            super.removeRange(fromIndex, toIndex);
-            employeeList.subList(fromIndex, toIndex).clear();
-        }
-
-        @Override
-        public void setElementAt(Employee element, int index) {
-            new EditorWindow(owner, element);
-            fireContentsChanged(this, index, index);
         }
     }
 }
