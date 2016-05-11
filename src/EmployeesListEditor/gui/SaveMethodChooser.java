@@ -11,7 +11,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-class FilePicker extends JFileChooser {
+class SaveMethodChooser extends JFileChooser {
 
     private class SerializerFileFilter extends FileFilter {
         private Class<? extends Serializer> serializerClass;
@@ -47,7 +47,7 @@ class FilePicker extends JFileChooser {
         }
     }
 
-    FilePicker(List<Class<? extends Serializer>> serializers) {
+    SaveMethodChooser(List<Class<? extends Serializer>> serializers) {
         Map<Class<? extends Serializer>, SerializerInfo> availableSerializers = getAvailableSerializers(serializers);
 
         setAcceptAllFileFilterUsed(false);

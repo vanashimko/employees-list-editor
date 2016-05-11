@@ -1,5 +1,6 @@
 package EmployeesListEditor.gui;
 
+import EmployeesListEditor.employees.Employee;
 import EmployeesListEditor.employees.drivers.PersonalDriver;
 import EmployeesListEditor.employees.drivers.TruckDriver;
 import EmployeesListEditor.employees.engineers.Programmer;
@@ -22,13 +23,21 @@ public class MainWindow extends JFrame {
         availableSerializers.add(XMLSerializer.class);
     }
 
+    private static List<Class<? extends Employee>> availableTypes = new ArrayList<>();
+    static{
+        availableTypes.add(PersonalDriver.class);
+        availableTypes.add(TruckDriver.class);
+        availableTypes.add(Programmer.class);
+        availableTypes.add(Technologist.class);
+        availableTypes.add(Fitter.class);
+        availableTypes.add(MachineOperator.class);
+    }
+
     public MainWindow() {
         super("Лабораторная работа №3");
         setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
         setMinimumSize(new Dimension(450, 300));
         setLocationRelativeTo(null);
-
-        Class[] availableTypes = {PersonalDriver.class, TruckDriver.class, Programmer.class, Technologist.class, Fitter.class, MachineOperator.class};
 
         ListEditor employeesListEditor = new ListEditor(this, availableTypes);
         add(employeesListEditor);
@@ -40,11 +49,11 @@ public class MainWindow extends JFrame {
 
         JMenuItem jmiOpen = new JMenuItem("Открыть");
         jmiOpen.addActionListener(event -> {
-            FilePicker filePicker = new FilePicker(availableSerializers);
+            SaveMethodChooser saveMethodChooser = new SaveMethodChooser(availableSerializers);
 
-            if (filePicker.showOpenDialog(MainWindow.this) == JFileChooser.APPROVE_OPTION) {
-                String fileName = filePicker.getSelectedFile().getAbsolutePath();
-                Serializer serializer = filePicker.getSerializer();
+            if (saveMethodChooser.showOpenDialog(MainWindow.this) == JFileChooser.APPROVE_OPTION) {
+                String fileName = saveMethodChooser.getSelectedFile().getAbsolutePath();
+                Serializer serializer = saveMethodChooser.getSerializer();
                 try {
                     employeesListEditor.loadFromFile(fileName, serializer);
                 } catch (SerializationException e){
@@ -59,21 +68,21 @@ public class MainWindow extends JFrame {
 
         JMenuItem jmiSave = new JMenuItem("Сохранить");
         jmiSave.addActionListener(event -> {
-            FilePicker filePicker = new FilePicker(availableSerializers);
+            SaveMethodChooser saveMethodChooser = new SaveMethodChooser(availableSerializers);
 
-            if (filePicker.showSaveDialog(MainWindow.this) == JFileChooser.APPROVE_OPTION) {
-                String fileName = filePicker.getSelectedFile().getAbsolutePath();
+            if (saveMethodChooser.showSaveDialog(MainWindow.this) == JFileChooser.APPROVE_OPTION) {
+                String fileName = saveMethodChooser.getSelectedFile().getAbsolutePath();
                 String fileNameExtension = "";
                 int dotPos = fileName.lastIndexOf(".");
                 if (dotPos > 0){
                     fileNameExtension = fileName.substring(dotPos + 1);
                 }
-                String formatExtension = filePicker.getExtension();
+                String formatExtension = saveMethodChooser.getExtension();
                 if (!fileNameExtension.equalsIgnoreCase(formatExtension)){
                     fileName += "." + formatExtension;
                 }
 
-                Serializer serializer = filePicker.getSerializer();
+                Serializer serializer = saveMethodChooser.getSerializer();
                 try {
                     employeesListEditor.saveToFile(fileName, serializer);
                 } catch (SerializationException e) {

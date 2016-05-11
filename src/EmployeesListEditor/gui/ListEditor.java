@@ -26,7 +26,7 @@ class ListEditor extends JPanel implements ListSelectionListener {
 
     private Frame owner;
 
-    ListEditor(Frame owner, Class<?>[] availableTypes) {
+    ListEditor(Frame owner, List<Class<? extends Employee>> availableTypes) {
         super(new BorderLayout());
         this.owner = owner;
         classesLocalizedNames = createLocalizedClassesNames(availableTypes);
@@ -47,7 +47,7 @@ class ListEditor extends JPanel implements ListSelectionListener {
         list.addListSelectionListener(this);
         JScrollPane listScrollPane = new JScrollPane(list);
 
-        cmbEmployeeType = new JComboBox<>(availableTypes);
+        cmbEmployeeType = new JComboBox<>(availableTypes.toArray(new Class[]{}));
         cmbEmployeeType.setRenderer(new DefaultListCellRenderer(){
             @Override
             public Component getListCellRendererComponent(JList<?> list, Object value, int index, boolean isSelected, boolean cellHasFocus) {
@@ -102,7 +102,7 @@ class ListEditor extends JPanel implements ListSelectionListener {
         listModel.addElement(employee);
     }
 
-    private Map<Class<?>, String> createLocalizedClassesNames(Class[] classes){
+    private Map<Class<?>, String> createLocalizedClassesNames(List<Class<? extends Employee>> classes){
         Map<Class<?>, String> result = new HashMap<>();
         for (Class<?> c : classes){
             String className = c.getSimpleName();
