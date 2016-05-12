@@ -36,13 +36,13 @@ public class SaveMethodChooser extends JFileChooser {
 
             switch (SaveMethodChooser.this.getDialogType()) {
                 case SAVE_DIALOG:
-                    if (fileName.endsWith(SaveMethodChooser.this.getSelectedPlugin().getPluginExtension())) {
+                    if (fileName.endsWith("." + SaveMethodChooser.this.getSelectedPlugin().getPluginExtension())) {
                         return true;
                     }
                     break;
                 case OPEN_DIALOG:
                     for (PluginInfo pluginInfo : plugins) {
-                        if (fileName.endsWith(pluginInfo.getPluginExtension())) {
+                        if (fileName.endsWith("." + pluginInfo.getPluginExtension())) {
                             return true;
                         }
                     }

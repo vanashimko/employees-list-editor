@@ -2,10 +2,7 @@ package EmployeesListEditor.serializers;
 
 import EmployeesListEditor.plugins.Plugin;
 
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
-import java.io.InputStream;
-import java.io.OutputStream;
+import java.io.*;
 
 public class SaveMethod implements Serializer{
     private Serializer serializer;
@@ -20,13 +17,21 @@ public class SaveMethod implements Serializer{
     public void serialize(Object o, OutputStream outputStream) throws SerializationException {
         ByteArrayOutputStream tmpOutputStream = new ByteArrayOutputStream();
         serializer.serialize(o, tmpOutputStream);
-        plugin.compress(new ByteArrayInputStream(tmpOutputStream.toByteArray()), outputStream);
+        try {
+            plugin.compress(new ByteArrayInputStream(tmpOutputStream.toByteArray()), outputStream);
+        } catch (IOException e){
+            throw new SerializationException(e);
+        }
     }
 
     @Override
     public Object deserialize(InputStream inputStream) throws SerializationException {
         ByteArrayOutputStream tmpOutputStream = new ByteArrayOutputStream();
-        plugin.decompress(inputStream, tmpOutputStream);
+        try {
+            plugin.decompress(inputStream, tmpOutputStream);
+        } catch (IOException e){
+            throw new SerializationException(e);
+        }
 
         return serializer.deserialize(new ByteArrayInputStream(tmpOutputStream.toByteArray()));
     }
