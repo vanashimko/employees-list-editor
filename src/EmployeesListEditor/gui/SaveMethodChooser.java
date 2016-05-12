@@ -16,6 +16,8 @@ import java.util.Map;
 
 class SaveMethodChooser extends JFileChooser {
     private JPanel pluginTypePanel;
+    private JComboBox<PluginInfo> pluginTypeCombobox;
+    private List<PluginInfo> plugins;
 
     private class SerializerFileFilter extends FileFilter {
         private Class<? extends Serializer> serializerClass;
@@ -28,12 +30,47 @@ class SaveMethodChooser extends JFileChooser {
 
         @Override
         public boolean accept(File f) {
-            return f.getName().endsWith("." + serializerInfo.extension());
+            String fileName = f.getName();
+
+            switch (SaveMethodChooser.this.getDialogType()){
+                case SAVE_DIALOG:
+                    if (fileName.endsWith(SaveMethodChooser.this.getSelectedPlugin().getPluginExtension())){
+                        return true;
+                    }
+                    break;
+                case OPEN_DIALOG:
+                    for (PluginInfo pluginInfo : plugins) {
+                        if (fileName.endsWith(pluginInfo.getPluginExtension())) {
+                            return true;
+                        }
+                    }
+                    break;
+                default:
+                    break;
+            }
+
+
+            return fileName.endsWith("." + serializerInfo.extension());
         }
 
         @Override
         public String getDescription() {
-            return serializerInfo.name() + " (*." + serializerInfo.extension() + ")";
+            final String EXTENSION_SEPARATOR = ", *.";
+
+            String result = serializerInfo.name() + " (*." + serializerInfo.extension();
+            switch (SaveMethodChooser.this.getDialogType()){
+                case SAVE_DIALOG:
+                    result += EXTENSION_SEPARATOR + SaveMethodChooser.this.getSelectedPlugin().getPluginExtension();
+                    break;
+                case OPEN_DIALOG:
+                    for(PluginInfo pluginInfo: plugins){
+                        result += EXTENSION_SEPARATOR + pluginInfo.getPluginExtension();
+                    }
+                    break;
+                default:
+                    break;
+            }
+            return result + ")";
         }
 
         Serializer getSerializer(){
@@ -51,8 +88,15 @@ class SaveMethodChooser extends JFileChooser {
         }
     }
 
+    private PluginInfo getSelectedPlugin() {
+        return (PluginInfo)pluginTypeCombobox.getSelectedItem();
+    }
+
     SaveMethodChooser(List<Class<? extends Serializer>> serializers, List<PluginInfo> plugins) {
         Map<Class<? extends Serializer>, SerializerInfo> availableSerializers = getAvailableSerializers(serializers);
+
+        this.plugins = plugins;
+        createPluginTypeCombobox();
 
         setAcceptAllFileFilterUsed(false);
 
@@ -60,7 +104,7 @@ class SaveMethodChooser extends JFileChooser {
             addChoosableFileFilter(new SerializerFileFilter(entry.getKey(), entry.getValue()));
         }
 
-        createPluginTypeCombobox(plugins);
+
 
         setCurrentDirectory(Paths.get(".").toFile());
     }
@@ -75,7 +119,7 @@ class SaveMethodChooser extends JFileChooser {
         return super.showDialog(parent, approveButtonText);
     }
 
-    private void createPluginTypeCombobox(List<PluginInfo> plugins){
+    private void createPluginTypeCombobox(){
         final int BUTTONS_PANEL_INDEX = 3;
 
         JPanel bottomPanel = (JPanel)getComponent(BUTTONS_PANEL_INDEX);
@@ -92,7 +136,7 @@ class SaveMethodChooser extends JFileChooser {
         JLabel pluginTypeLabel = new JLabel("Plugin:");
         pluginTypePanel.add(pluginTypeLabel);
 
-        JComboBox<PluginInfo> pluginTypeCombobox = new JComboBox<>(plugins.toArray(new PluginInfo[plugins.size()]));
+        pluginTypeCombobox = new JComboBox<>(plugins.toArray(new PluginInfo[plugins.size()]));
         pluginTypeCombobox.setRenderer(new DefaultListCellRenderer(){
             @Override
             public Component getListCellRendererComponent(JList<?> list, Object value, int index, boolean isSelected, boolean cellHasFocus) {
@@ -100,6 +144,7 @@ class SaveMethodChooser extends JFileChooser {
                 if (value != null){
                     PluginInfo plugin = (PluginInfo)value;
                     setText(plugin.getPluginName());
+                    SaveMethodChooser.this.repaint();
                 }
                 return this;
             }
