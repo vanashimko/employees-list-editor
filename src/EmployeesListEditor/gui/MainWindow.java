@@ -15,10 +15,8 @@ import EmployeesListEditor.serializers.*;
 
 import javax.swing.*;
 import java.awt.*;
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.ExecutionException;
 
 public class MainWindow extends JFrame {
     private static final String PLUGINS_PATH = "plugins";
@@ -43,6 +41,8 @@ public class MainWindow extends JFrame {
 
     private static List<PluginInfo> plugins = PluginLoader.loadPlugins(PLUGINS_PATH);
 
+    private static SaveMethodChooser saveMethodChooser = new SaveMethodChooser(availableSerializers, plugins);
+
     public MainWindow() {
         super("Лабораторная работа №3");
         setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
@@ -58,36 +58,10 @@ public class MainWindow extends JFrame {
         jmbMain.add(jmFile);
 
         JMenuItem jmiOpen = new JMenuItem("Открыть");
-        jmiOpen.addActionListener(event -> {
-            SaveMethodChooser saveMethodChooser = new SaveMethodChooser(availableSerializers, plugins);
-
-            if (saveMethodChooser.showOpenDialog(MainWindow.this) == JFileChooser.APPROVE_OPTION) {
-                String fileName = saveMethodChooser.getSelectedFile().getAbsolutePath();
-                Serializer serializer = saveMethodChooser.getSerializer();
-                employeesListEditor.executeCommand(new ListCommandLoad(fileName, serializer));
-            }
-        });
+        jmiOpen.addActionListener(event -> employeesListEditor.executeCommand(new ListCommandLoad(saveMethodChooser)));
 
         JMenuItem jmiSave = new JMenuItem("Сохранить");
-        jmiSave.addActionListener(event -> {
-            SaveMethodChooser saveMethodChooser = new SaveMethodChooser(availableSerializers, plugins);
-
-            if (saveMethodChooser.showSaveDialog(MainWindow.this) == JFileChooser.APPROVE_OPTION) {
-                String fileName = saveMethodChooser.getSelectedFile().getAbsolutePath();
-                String fileNameExtension = "";
-                int dotPos = fileName.lastIndexOf(".");
-                if (dotPos > 0) {
-                    fileNameExtension = fileName.substring(dotPos + 1);
-                }
-                String formatExtension = saveMethodChooser.getExtension();
-                if (!fileNameExtension.equalsIgnoreCase(formatExtension)) {
-                    fileName += "." + formatExtension;
-                }
-
-                Serializer serializer = saveMethodChooser.getSerializer();
-                employeesListEditor.executeCommand(new ListCommandSave(fileName, serializer));
-            }
-        });
+        jmiSave.addActionListener(event -> employeesListEditor.executeCommand(new ListCommandSave(saveMethodChooser)));
         jmFile.add(jmiOpen);
         jmFile.add(jmiSave);
 

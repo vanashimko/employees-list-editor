@@ -8,7 +8,7 @@ import java.io.OutputStream;
 public class GZIPPlugin implements Plugin {
     @Override
     public void compress(InputStream in, OutputStream out) {
-
+        System.out.println("gzip");
     }
 
     @Override

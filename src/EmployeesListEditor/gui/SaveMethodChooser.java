@@ -2,6 +2,8 @@ package EmployeesListEditor.gui;
 
 import EmployeesListEditor.plugins.Plugin;
 import EmployeesListEditor.plugins.PluginInfo;
+import EmployeesListEditor.serializers.SaveMethod;
+import EmployeesListEditor.serializers.SerializationException;
 import EmployeesListEditor.serializers.Serializer;
 import EmployeesListEditor.serializers.SerializerInfo;
 
@@ -14,7 +16,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-class SaveMethodChooser extends JFileChooser {
+public class SaveMethodChooser extends JFileChooser {
     private JPanel pluginTypePanel;
     private JComboBox<PluginInfo> pluginTypeCombobox;
     private List<PluginInfo> plugins;
@@ -32,9 +34,9 @@ class SaveMethodChooser extends JFileChooser {
         public boolean accept(File f) {
             String fileName = f.getName();
 
-            switch (SaveMethodChooser.this.getDialogType()){
+            switch (SaveMethodChooser.this.getDialogType()) {
                 case SAVE_DIALOG:
-                    if (fileName.endsWith(SaveMethodChooser.this.getSelectedPlugin().getPluginExtension())){
+                    if (fileName.endsWith(SaveMethodChooser.this.getSelectedPlugin().getPluginExtension())) {
                         return true;
                     }
                     break;
@@ -58,12 +60,12 @@ class SaveMethodChooser extends JFileChooser {
             final String EXTENSION_SEPARATOR = ", *.";
 
             String result = serializerInfo.name() + " (*." + serializerInfo.extension();
-            switch (SaveMethodChooser.this.getDialogType()){
+            switch (SaveMethodChooser.this.getDialogType()) {
                 case SAVE_DIALOG:
                     result += EXTENSION_SEPARATOR + SaveMethodChooser.this.getSelectedPlugin().getPluginExtension();
                     break;
                 case OPEN_DIALOG:
-                    for(PluginInfo pluginInfo: plugins){
+                    for (PluginInfo pluginInfo : plugins) {
                         result += EXTENSION_SEPARATOR + pluginInfo.getPluginExtension();
                     }
                     break;
@@ -73,23 +75,45 @@ class SaveMethodChooser extends JFileChooser {
             return result + ")";
         }
 
-        Serializer getSerializer(){
-            Serializer result = null;
-            try {
-                result = serializerClass.newInstance();
-            } catch (InstantiationException | IllegalAccessException e) {
-                e.printStackTrace();
+        private Plugin getOpenerPlugin() {
+            String fileName = getSelectedFile().getAbsolutePath();
+            String extenstion = fileName.substring(fileName.lastIndexOf(".") + 1, fileName.length());
+            for (PluginInfo plugin : plugins) {
+                if (plugin.getPluginExtension().equals(extenstion)) {
+                    return plugin.getInstance();
+                }
             }
-            return result;
+            return null;
         }
 
-        String getExtension(){
-            return serializerInfo.extension();
+        Serializer getSerializer() throws SerializationException {
+            Serializer serializer;
+
+            try {
+                serializer = serializerClass.newInstance();
+            } catch (InstantiationException | IllegalAccessException e) {
+                e.printStackTrace();
+                throw new SerializationException(e);
+            }
+
+            if (SaveMethodChooser.this.getDialogType() == OPEN_DIALOG) {
+                Plugin openerPlugin = getOpenerPlugin();
+                if (openerPlugin == null) {
+                    throw new SerializationException("No plugin for such file.");
+                }
+                serializer = new SaveMethod(serializer, getOpenerPlugin());
+            }
+
+            return serializer;
+        }
+
+        public String getExtension() {
+            return SaveMethodChooser.this.getSelectedPlugin().getPluginExtension();
         }
     }
 
     private PluginInfo getSelectedPlugin() {
-        return (PluginInfo)pluginTypeCombobox.getSelectedItem();
+        return (PluginInfo) pluginTypeCombobox.getSelectedItem();
     }
 
     SaveMethodChooser(List<Class<? extends Serializer>> serializers, List<PluginInfo> plugins) {
@@ -104,13 +128,15 @@ class SaveMethodChooser extends JFileChooser {
             addChoosableFileFilter(new SerializerFileFilter(entry.getKey(), entry.getValue()));
         }
 
-
-
         setCurrentDirectory(Paths.get(".").toFile());
     }
 
-    Serializer getSerializer() {
-        return ((SerializerFileFilter)getFileFilter()).getSerializer();
+    public Serializer getSerializer() throws SerializationException {
+        Serializer serializer = ((SerializerFileFilter) getFileFilter()).getSerializer();
+        if (getDialogType() == SAVE_DIALOG) {
+            serializer = new SaveMethod(serializer, getSelectedPlugin().getInstance());
+        }
+        return serializer;
     }
 
     @Override
@@ -119,10 +145,10 @@ class SaveMethodChooser extends JFileChooser {
         return super.showDialog(parent, approveButtonText);
     }
 
-    private void createPluginTypeCombobox(){
+    private void createPluginTypeCombobox() {
         final int BUTTONS_PANEL_INDEX = 3;
 
-        JPanel bottomPanel = (JPanel)getComponent(BUTTONS_PANEL_INDEX);
+        JPanel bottomPanel = (JPanel) getComponent(BUTTONS_PANEL_INDEX);
         Component buttonsPanel = bottomPanel.getComponent(BUTTONS_PANEL_INDEX);
         bottomPanel.remove(3);
 
@@ -137,12 +163,12 @@ class SaveMethodChooser extends JFileChooser {
         pluginTypePanel.add(pluginTypeLabel);
 
         pluginTypeCombobox = new JComboBox<>(plugins.toArray(new PluginInfo[plugins.size()]));
-        pluginTypeCombobox.setRenderer(new DefaultListCellRenderer(){
+        pluginTypeCombobox.setRenderer(new DefaultListCellRenderer() {
             @Override
             public Component getListCellRendererComponent(JList<?> list, Object value, int index, boolean isSelected, boolean cellHasFocus) {
                 super.getListCellRendererComponent(list, value, index, isSelected, cellHasFocus);
-                if (value != null){
-                    PluginInfo plugin = (PluginInfo)value;
+                if (value != null) {
+                    PluginInfo plugin = (PluginInfo) value;
                     setText(plugin.getPluginName());
                     SaveMethodChooser.this.repaint();
                 }
@@ -154,7 +180,7 @@ class SaveMethodChooser extends JFileChooser {
         pluginTypePanel.add(pluginTypeCombobox);
     }
 
-    private Map<Class<? extends Serializer> , SerializerInfo> getAvailableSerializers(List<Class<? extends Serializer>> serializers) {
+    private Map<Class<? extends Serializer>, SerializerInfo> getAvailableSerializers(List<Class<? extends Serializer>> serializers) {
         Map<Class<? extends Serializer>, SerializerInfo> result = new HashMap<>();
         for (Class<? extends Serializer> serializer : serializers) {
             if (serializer.isAnnotationPresent(SerializerInfo.class)) {
@@ -164,7 +190,7 @@ class SaveMethodChooser extends JFileChooser {
         return result;
     }
 
-    String getExtension(){
-        return ((SerializerFileFilter)getFileFilter()).getExtension();
+    public String getExtension() {
+        return ((SerializerFileFilter) getFileFilter()).getExtension();
     }
 }
