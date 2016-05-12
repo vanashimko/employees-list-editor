@@ -17,7 +17,8 @@ public class Main {
             if (System.getProperty("os.name").equals("Linux")) {
                 UIManager.setLookAndFeel("com.sun.java.swing.plaf.gtk.GTKLookAndFeel");
             } else {
-                UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
+                UIManager.setLookAndFeel("com.sun.java.swing.plaf.gtk.GTKLookAndFeel");
+//                UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
             }
         } catch (Exception e) {
             System.err.println("Error while changing Look and Feel");

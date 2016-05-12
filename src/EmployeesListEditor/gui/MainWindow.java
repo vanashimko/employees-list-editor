@@ -9,6 +9,8 @@ import EmployeesListEditor.employees.workers.Fitter;
 import EmployeesListEditor.employees.workers.MachineOperator;
 import EmployeesListEditor.gui.commands.ListCommandLoad;
 import EmployeesListEditor.gui.commands.ListCommandSave;
+import EmployeesListEditor.plugins.PluginInfo;
+import EmployeesListEditor.plugins.PluginLoader;
 import EmployeesListEditor.serializers.*;
 
 import javax.swing.*;
@@ -19,6 +21,7 @@ import java.util.List;
 import java.util.concurrent.ExecutionException;
 
 public class MainWindow extends JFrame {
+    private static final String PLUGINS_PATH = "plugins";
     private static List<Class<? extends Serializer>> availableSerializers = new ArrayList<>();
 
     static {
@@ -38,6 +41,8 @@ public class MainWindow extends JFrame {
         availableTypes.add(MachineOperator.class);
     }
 
+    private static List<PluginInfo> plugins = PluginLoader.loadPlugins(PLUGINS_PATH);
+
     public MainWindow() {
         super("Лабораторная работа №3");
         setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
@@ -54,7 +59,7 @@ public class MainWindow extends JFrame {
 
         JMenuItem jmiOpen = new JMenuItem("Открыть");
         jmiOpen.addActionListener(event -> {
-            SaveMethodChooser saveMethodChooser = new SaveMethodChooser(availableSerializers);
+            SaveMethodChooser saveMethodChooser = new SaveMethodChooser(availableSerializers, plugins);
 
             if (saveMethodChooser.showOpenDialog(MainWindow.this) == JFileChooser.APPROVE_OPTION) {
                 String fileName = saveMethodChooser.getSelectedFile().getAbsolutePath();
@@ -65,7 +70,7 @@ public class MainWindow extends JFrame {
 
         JMenuItem jmiSave = new JMenuItem("Сохранить");
         jmiSave.addActionListener(event -> {
-            SaveMethodChooser saveMethodChooser = new SaveMethodChooser(availableSerializers);
+            SaveMethodChooser saveMethodChooser = new SaveMethodChooser(availableSerializers, plugins);
 
             if (saveMethodChooser.showSaveDialog(MainWindow.this) == JFileChooser.APPROVE_OPTION) {
                 String fileName = saveMethodChooser.getSelectedFile().getAbsolutePath();

@@ -46,7 +46,7 @@ class ListEditor extends JPanel implements ListSelectionListener {
         list.addListSelectionListener(this);
         JScrollPane listScrollPane = new JScrollPane(list);
 
-        cmbEmployeeType = new JComboBox<>(availableTypes.toArray(new Class[]{}));
+        cmbEmployeeType = new JComboBox<>(availableTypes.toArray(new Class[availableTypes.size()]));
         cmbEmployeeType.setRenderer(new DefaultListCellRenderer() {
             @Override
             public Component getListCellRendererComponent(JList<?> list, Object value, int index, boolean isSelected, boolean cellHasFocus) {
@@ -92,7 +92,7 @@ class ListEditor extends JPanel implements ListSelectionListener {
         return result;
     }
 
-    void executeCommand(ListCommand command){
+    void executeCommand(ListCommand command) {
         command.execute(listModel);
     }
 

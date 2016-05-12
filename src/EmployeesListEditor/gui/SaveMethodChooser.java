@@ -1,10 +1,13 @@
 package EmployeesListEditor.gui;
 
+import EmployeesListEditor.plugins.Plugin;
+import EmployeesListEditor.plugins.PluginInfo;
 import EmployeesListEditor.serializers.Serializer;
 import EmployeesListEditor.serializers.SerializerInfo;
 
 import javax.swing.*;
 import javax.swing.filechooser.FileFilter;
+import java.awt.*;
 import java.io.File;
 import java.nio.file.Paths;
 import java.util.HashMap;
@@ -12,6 +15,7 @@ import java.util.List;
 import java.util.Map;
 
 class SaveMethodChooser extends JFileChooser {
+    private JPanel pluginTypePanel;
 
     private class SerializerFileFilter extends FileFilter {
         private Class<? extends Serializer> serializerClass;
@@ -47,7 +51,7 @@ class SaveMethodChooser extends JFileChooser {
         }
     }
 
-    SaveMethodChooser(List<Class<? extends Serializer>> serializers) {
+    SaveMethodChooser(List<Class<? extends Serializer>> serializers, List<PluginInfo> plugins) {
         Map<Class<? extends Serializer>, SerializerInfo> availableSerializers = getAvailableSerializers(serializers);
 
         setAcceptAllFileFilterUsed(false);
@@ -56,11 +60,53 @@ class SaveMethodChooser extends JFileChooser {
             addChoosableFileFilter(new SerializerFileFilter(entry.getKey(), entry.getValue()));
         }
 
+        createPluginTypeCombobox(plugins);
+
         setCurrentDirectory(Paths.get(".").toFile());
     }
 
     Serializer getSerializer() {
         return ((SerializerFileFilter)getFileFilter()).getSerializer();
+    }
+
+    @Override
+    public int showDialog(Component parent, String approveButtonText) throws HeadlessException {
+        this.pluginTypePanel.setVisible((getDialogType() == SAVE_DIALOG));
+        return super.showDialog(parent, approveButtonText);
+    }
+
+    private void createPluginTypeCombobox(List<PluginInfo> plugins){
+        final int BUTTONS_PANEL_INDEX = 3;
+
+        JPanel bottomPanel = (JPanel)getComponent(BUTTONS_PANEL_INDEX);
+        Component buttonsPanel = bottomPanel.getComponent(BUTTONS_PANEL_INDEX);
+        bottomPanel.remove(3);
+
+        bottomPanel.add(Box.createVerticalStrut(5));
+        this.pluginTypePanel = new JPanel();
+        pluginTypePanel.setLayout(new BoxLayout(pluginTypePanel, BoxLayout.LINE_AXIS));
+        bottomPanel.add(pluginTypePanel);
+
+        bottomPanel.add(buttonsPanel);
+
+        JLabel pluginTypeLabel = new JLabel("Plugin:");
+        pluginTypePanel.add(pluginTypeLabel);
+
+        JComboBox<PluginInfo> pluginTypeCombobox = new JComboBox<>(plugins.toArray(new PluginInfo[plugins.size()]));
+        pluginTypeCombobox.setRenderer(new DefaultListCellRenderer(){
+            @Override
+            public Component getListCellRendererComponent(JList<?> list, Object value, int index, boolean isSelected, boolean cellHasFocus) {
+                super.getListCellRendererComponent(list, value, index, isSelected, cellHasFocus);
+                if (value != null){
+                    PluginInfo plugin = (PluginInfo)value;
+                    setText(plugin.getPluginName());
+                }
+                return this;
+            }
+        });
+        pluginTypePanel.add(pluginTypeLabel);
+        pluginTypePanel.add(Box.createHorizontalStrut(5));
+        pluginTypePanel.add(pluginTypeCombobox);
     }
 
     private Map<Class<? extends Serializer> , SerializerInfo> getAvailableSerializers(List<Class<? extends Serializer>> serializers) {

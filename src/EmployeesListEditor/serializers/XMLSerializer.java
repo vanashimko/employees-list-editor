@@ -2,7 +2,6 @@ package EmployeesListEditor.serializers;
 
 import java.beans.XMLDecoder;
 import java.beans.XMLEncoder;
-import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 
