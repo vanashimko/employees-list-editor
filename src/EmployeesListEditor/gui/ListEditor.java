@@ -1,19 +1,15 @@
 package EmployeesListEditor.gui;
 
 import EmployeesListEditor.employees.Employee;
-import EmployeesListEditor.gui.commands.ListCommandAdd;
 import EmployeesListEditor.gui.commands.ListCommand;
+import EmployeesListEditor.gui.commands.ListCommandAdd;
 import EmployeesListEditor.gui.commands.ListCommandEdit;
 import EmployeesListEditor.gui.commands.ListCommandRemoveRange;
-import EmployeesListEditor.serializers.SerializationException;
-import EmployeesListEditor.serializers.Serializer;
 
 import javax.swing.*;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 import java.awt.*;
-import java.io.*;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -21,7 +17,6 @@ import java.util.Map;
 class ListEditor extends JPanel implements ListSelectionListener {
     private JList<Employee> list;
     private DefaultListModel<Employee> listModel;
-    private List<Employee> employeeList = new ArrayList<>();
 
     private Map<Class<?>, String> classesLocalizedNames;
 
@@ -85,12 +80,6 @@ class ListEditor extends JPanel implements ListSelectionListener {
         add(buttonPanel, BorderLayout.PAGE_END);
     }
 
-    @Deprecated
-    public void addEmployee(Employee employee) {
-        listModel.addElement(employee);
-        employeeList.add(employee);
-    }
-
     private Map<Class<?>, String> createLocalizedClassesNames(List<Class<? extends Employee>> classes) {
         Map<Class<?>, String> result = new HashMap<>();
         for (Class<?> c : classes) {
@@ -103,24 +92,7 @@ class ListEditor extends JPanel implements ListSelectionListener {
         return result;
     }
 
-    void saveToFile(String fileName, Serializer serializer) throws SerializationException, IOException {
-        BufferedOutputStream out = new BufferedOutputStream(new FileOutputStream(fileName));
-        serializer.serialize(employeeList, out);
-        out.close();
-    }
-
-    @SuppressWarnings("unchecked")
-    void loadFromFile(String fileName, Serializer serializer) throws SerializationException, IOException {
-        BufferedInputStream in = new BufferedInputStream(new FileInputStream(fileName));
-        List<Employee> loadedList = (List<Employee>) serializer.deserialize(in);
-        listModel.clear();
-        employeeList.clear();
-        loadedList.forEach(this::addEmployee);
-        in.close();
-
-    }
-
-    public void executeCommand(ListCommand command){
+    void executeCommand(ListCommand command){
         command.execute(listModel);
     }
 

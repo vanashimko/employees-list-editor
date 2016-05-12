@@ -7,6 +7,7 @@ import EmployeesListEditor.employees.engineers.Programmer;
 import EmployeesListEditor.employees.engineers.Technologist;
 import EmployeesListEditor.employees.workers.Fitter;
 import EmployeesListEditor.employees.workers.MachineOperator;
+import EmployeesListEditor.gui.commands.ListCommandLoad;
 import EmployeesListEditor.gui.commands.ListCommandSave;
 import EmployeesListEditor.serializers.*;
 
@@ -58,15 +59,7 @@ public class MainWindow extends JFrame {
             if (saveMethodChooser.showOpenDialog(MainWindow.this) == JFileChooser.APPROVE_OPTION) {
                 String fileName = saveMethodChooser.getSelectedFile().getAbsolutePath();
                 Serializer serializer = saveMethodChooser.getSerializer();
-                try {
-                    employeesListEditor.loadFromFile(fileName, serializer);
-                } catch (SerializationException e) {
-                    JOptionPane.showMessageDialog(null, "Ошибка десериализации ", "Ошибка", JOptionPane.ERROR_MESSAGE);
-                    e.printStackTrace();
-                } catch (IOException e) {
-                    JOptionPane.showMessageDialog(null, "Ошибка чтения из файла", "Ошибка", JOptionPane.ERROR_MESSAGE);
-                    e.printStackTrace();
-                }
+                employeesListEditor.executeCommand(new ListCommandLoad(fileName, serializer));
             }
         });
 
