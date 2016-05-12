@@ -65,15 +65,15 @@ class ListEditor extends JPanel implements ListSelectionListener {
         });
 
         JButton addButton = new JButton("Добавить");
-        addButton.addActionListener(event -> executeCommand(new ListCommandAdd(getSelectedEmployeeType(), listModel, employeeList, owner)));
+        addButton.addActionListener(event -> executeCommand(new ListCommandAdd(getSelectedEmployeeType(), owner)));
 
         removeButton = new JButton("Удалить");
         removeButton.setEnabled(false);
-        removeButton.addActionListener(e -> executeCommand(new ListCommandRemoveRange(listModel, employeeList, list.getMinSelectionIndex(), list.getMaxSelectionIndex())));
+        removeButton.addActionListener(e -> executeCommand(new ListCommandRemoveRange(list.getMinSelectionIndex(), list.getMaxSelectionIndex())));
 
         editButton = new JButton("Изменить");
         editButton.setEnabled(false);
-        editButton.addActionListener(e -> executeCommand(new ListCommandEdit(listModel, list.getSelectedIndex(), owner)));
+        editButton.addActionListener(e -> executeCommand(new ListCommandEdit(list.getSelectedIndex(), owner)));
 
         JPanel buttonPanel = new JPanel();
         buttonPanel.add(addButton);
@@ -120,8 +120,8 @@ class ListEditor extends JPanel implements ListSelectionListener {
 
     }
 
-    public void executeCommand(ListCommand command) {
-        command.execute();
+    public void executeCommand(ListCommand command){
+        command.execute(listModel);
     }
 
     private Class<? extends Employee> getSelectedEmployeeType() {
