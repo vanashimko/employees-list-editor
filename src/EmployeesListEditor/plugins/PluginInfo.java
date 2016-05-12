@@ -20,6 +20,7 @@ public class PluginInfo {
     private String pluginName;
     private String pluginExtension;
 
+    public PluginInfo(){}
     public PluginInfo(File file) throws PluginLoadException {
         try {
             Properties properties = getPluginProperties(file);
