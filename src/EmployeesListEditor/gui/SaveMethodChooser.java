@@ -11,6 +11,8 @@ import EmployeesListEditor.serializers.SerializerInfo;
 import javax.swing.*;
 import javax.swing.filechooser.FileFilter;
 import java.awt.*;
+import java.awt.event.ItemEvent;
+import java.awt.event.ItemListener;
 import java.io.File;
 import java.nio.file.Paths;
 import java.util.HashMap;
@@ -33,14 +35,19 @@ public class SaveMethodChooser extends JFileChooser {
 
         @Override
         public boolean accept(File f) {
+            if (f.isDirectory()){
+                return true;
+            }
+
             String fileName = f.getName();
 
             switch (SaveMethodChooser.this.getDialogType()) {
                 case SAVE_DIALOG:
-                    if (fileName.endsWith("." + SaveMethodChooser.this.getSelectedPlugin().getPluginExtension())) {
-                        return true;
+                    String validExtension = SaveMethodChooser.this.getSelectedPlugin().getPluginExtension();
+                    if (validExtension.isEmpty()) {
+                        validExtension = serializerInfo.extension();
                     }
-                    break;
+                    return fileName.endsWith("." + validExtension);
                 case OPEN_DIALOG:
                     for (PluginInfo pluginInfo : plugins) {
                         if (fileName.endsWith("." + pluginInfo.getPluginExtension())) {
@@ -183,15 +190,16 @@ public class SaveMethodChooser extends JFileChooser {
         pluginTypePanel.add(pluginTypeLabel);
 
         pluginTypeCombobox = new JComboBox<>(plugins.toArray(new PluginInfo[plugins.size()]));
-
+        pluginTypeCombobox.addItemListener(e -> {
+            rescanCurrentDirectory();
+            repaint();
+        });
         pluginTypeCombobox.setRenderer(new DefaultListCellRenderer() {
             @Override
             public Component getListCellRendererComponent(JList<?> list, Object value, int index, boolean isSelected, boolean cellHasFocus) {
                 super.getListCellRendererComponent(list, value, index, isSelected, cellHasFocus);
                 if (value != null) {
-                    PluginInfo plugin = (PluginInfo) value;
-                    setText(plugin.getPluginName());
-                    SaveMethodChooser.this.repaint();
+                    setText(((PluginInfo) value).getPluginName());
                 }
                 return this;
             }
