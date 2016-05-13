@@ -20,8 +20,11 @@ public class PluginInfo {
     private String pluginName;
     private String pluginExtension;
 
-    public PluginInfo(){}
-    public PluginInfo(File file) throws PluginLoadException {
+    private static final PluginInfo noPluginMarker = new PluginInfo();
+
+    private PluginInfo() {}
+
+    PluginInfo(File file) throws PluginLoadException {
         try {
             Properties properties = getPluginProperties(file);
             if (properties == null) {
@@ -83,5 +86,9 @@ public class PluginInfo {
             }
         }
         return result;
+    }
+
+    public static PluginInfo getNoPluginMarker() {
+        return noPluginMarker;
     }
 }

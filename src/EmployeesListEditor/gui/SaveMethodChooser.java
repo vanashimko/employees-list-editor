@@ -1,6 +1,5 @@
 package EmployeesListEditor.gui;
 
-import EmployeesListEditor.plugins.NoPlugin;
 import EmployeesListEditor.plugins.Plugin;
 import EmployeesListEditor.plugins.PluginInfo;
 import EmployeesListEditor.serializers.SaveMethod;
@@ -11,8 +10,6 @@ import EmployeesListEditor.serializers.SerializerInfo;
 import javax.swing.*;
 import javax.swing.filechooser.FileFilter;
 import java.awt.*;
-import java.awt.event.ItemEvent;
-import java.awt.event.ItemListener;
 import java.io.File;
 import java.nio.file.Paths;
 import java.util.HashMap;
@@ -143,7 +140,7 @@ public class SaveMethodChooser extends JFileChooser {
         Map<Class<? extends Serializer>, SerializerInfo> availableSerializers = getAvailableSerializers(serializers);
 
         this.plugins = plugins;
-        plugins.add(0, new NoPlugin());
+        plugins.add(0, PluginInfo.getNoPluginMarker());
         createPluginTypeCombobox();
 
         setAcceptAllFileFilterUsed(false);
