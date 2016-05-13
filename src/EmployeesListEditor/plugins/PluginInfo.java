@@ -22,7 +22,11 @@ public class PluginInfo {
 
     private static final PluginInfo noPluginMarker = new PluginInfo();
 
-    private PluginInfo() {}
+    private PluginInfo() {
+        pluginName = "No plugin";
+        pluginExtension = "";
+        instance = null;
+    }
 
     PluginInfo(File file) throws PluginLoadException {
         try {
