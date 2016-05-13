@@ -12,6 +12,7 @@ import javax.swing.filechooser.FileFilter;
 import java.awt.*;
 import java.io.File;
 import java.nio.file.Paths;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -139,8 +140,9 @@ public class SaveMethodChooser extends JFileChooser {
     SaveMethodChooser(List<Class<? extends Serializer>> serializers, List<PluginInfo> plugins) {
         Map<Class<? extends Serializer>, SerializerInfo> availableSerializers = getAvailableSerializers(serializers);
 
-        this.plugins = plugins;
-        plugins.add(0, PluginInfo.getNoPluginMarker());
+        this.plugins = new ArrayList<>();
+        this.plugins.add(PluginInfo.getNoPluginMarker());
+        this.plugins.addAll(plugins);
         createPluginTypeCombobox();
 
         setAcceptAllFileFilterUsed(false);
