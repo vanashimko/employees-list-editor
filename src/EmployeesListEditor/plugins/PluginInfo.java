@@ -10,6 +10,7 @@ import java.net.URLClassLoader;
 import java.util.Properties;
 import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
+import java.util.stream.Stream;
 
 public class PluginInfo {
     private final String PROPERTIES_FILE = "plugin.properties";
@@ -77,15 +78,9 @@ public class PluginInfo {
         IterableEnumeration<JarEntry> entries = new IterableEnumeration<>(jarFile.entries());
         for (JarEntry entry : entries) {
             if (entry.getName().equals(PROPERTIES_FILE)) {
-                InputStream in = null;
-                try {
-                    in = jarFile.getInputStream(entry);
+                try (InputStream in = jarFile.getInputStream(entry)){
                     result = new Properties();
                     result.load(in);
-                } finally {
-                    if (in != null) {
-                        in.close();
-                    }
                 }
             }
         }
