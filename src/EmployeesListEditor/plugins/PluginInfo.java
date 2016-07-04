@@ -37,7 +37,7 @@ public class PluginInfo {
             }
 
             String pluginClassName = properties.getProperty(CLASS_PROPERTY);
-            if (pluginClassName == null || pluginClassName.length() == 0) {
+            if (pluginClassName == null || pluginClassName.isEmpty()) {
                 throw new PluginLoadException("Missing main class property.");
             }
 
@@ -47,7 +47,7 @@ public class PluginInfo {
             }
 
             pluginExtension = properties.getProperty(EXTENSION_PROPERTY);
-            if (pluginExtension == null || pluginExtension.length() == 0) {
+            if (pluginExtension == null || pluginExtension.isEmpty()) {
                 throw new PluginLoadException("Missing plugin extension property.");
             }
 
