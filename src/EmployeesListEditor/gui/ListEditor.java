@@ -18,7 +18,7 @@ class ListEditor extends JPanel implements ListSelectionListener {
     private JList<Employee> list;
     private DefaultListModel<Employee> listModel;
 
-    private Map<Class<?>, String> classesLocalizedNames;
+    private Map<Class<? extends Employee>, String> classesLocalizedNames;
 
     private JButton removeButton;
     private JButton editButton;
@@ -80,9 +80,9 @@ class ListEditor extends JPanel implements ListSelectionListener {
         add(buttonPanel, BorderLayout.PAGE_END);
     }
 
-    private Map<Class<?>, String> createLocalizedClassesNames(List<Class<? extends Employee>> classes) {
-        Map<Class<?>, String> result = new HashMap<>();
-        for (Class<?> c : classes) {
+    private Map<Class<? extends Employee>, String> createLocalizedClassesNames(List<Class<? extends Employee>> classes) {
+        Map<Class<? extends Employee>, String> result = new HashMap<>();
+        for (Class<? extends Employee> c : classes) {
             String className = c.getSimpleName();
             if (c.isAnnotationPresent(LocalizedName.class)) {
                 className = c.getAnnotation(LocalizedName.class).value();
