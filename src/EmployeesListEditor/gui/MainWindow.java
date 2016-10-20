@@ -11,7 +11,10 @@ import EmployeesListEditor.gui.commands.ListCommandLoad;
 import EmployeesListEditor.gui.commands.ListCommandSave;
 import EmployeesListEditor.plugins.PluginInfo;
 import EmployeesListEditor.plugins.PluginLoader;
-import EmployeesListEditor.serializers.*;
+import EmployeesListEditor.serializers.BinarySerializer;
+import EmployeesListEditor.serializers.CustomTextSerializer;
+import EmployeesListEditor.serializers.Serializer;
+import EmployeesListEditor.serializers.XMLSerializer;
 
 import javax.swing.*;
 import java.awt.*;
